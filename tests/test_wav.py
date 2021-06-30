@@ -18,7 +18,7 @@ def teardown_module():
 
 def test_read_audiomoth():
     ## check that the function reads a wav file to an obspy trace without error
-    tr = read_audiomoth('../data/20210505_090000.WAV', station = 'AM', location = '00')
+    tr = read_audiomoth('../data/20210414_060000.WAV', station = 'AM', location = '00')
 
     ## check that the output trace has the correct start time
     assert tr.stats.starttime == obspy.UTCDateTime('20210505_0900')
