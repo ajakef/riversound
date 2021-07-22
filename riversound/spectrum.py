@@ -28,7 +28,7 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0, runmed_rad
         
     return {'specgram':sg, 'freqs':freqs, 'times':times, 'mean':np.nanmean(sg,1), 'median':np.nanmedian(sg,1)}
     
-def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=True):
+def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False):
     # Z rows are x, columns are y
     if x is None:
         x = np.arange(Z.shape[0])
