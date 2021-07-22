@@ -2,21 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import obspy, glob, datetime
 from scipy.stats import kurtosis
-
+    
 ## define a function to find the start time of a mseed file given its file name.
 ## we could just read the files directly and find the start times from the contents, but that would be a lot slower.
 ## keep in mind that the file name may include the path
 def find_mseed_start_time(filename):
+    
     ## code goes here...use the "split" method for the filename string
-    return obspy.UTCDateTime(file_start_time)
-
+    first_split = filename.split('..')
+    better_split = first_split[0].split('/')
+    date_split = better_split[-1]
+    return obspy.UTCDateTime(date_split)
 #%%
-mseed_list = sorted(glob.glob('mseed/*')) # fix the folder path if needed
+mseed_list = sorted(glob.glob('/home/scott/Desktop/2021-04-30-Whitewater/mseed/*')) # fix the folder path if needed
 
-t1 = obspy.UTCDateTime('2021-05-03T00:00:00')
-t2 = obspy.UTCDateTime('2021-05-03T22:00:00')
+t1 = obspy.UTCDateTime('2021-04-09T22:00:00')
+t2 = obspy.UTCDateTime('2021-04-30T21:00:00')
 
-overlap = 0.25
+overlap = 0.5 # play with these
 window_length_sec = 60
 
 window_start_time = t1
@@ -46,17 +49,21 @@ while window_start_time < t2:
         st.merge(fill_value = 'interpolate') 
 
     st.trim(window_start_time, t2) # get rid of unneeded old data
-
+        
     ## use st.slice create a temporary trace with just this time window to do calculations on
+    st_win = st.slice(window_start_time,window_start_time+window_length_sec)
+    tr_win = st_win[0]
     ## a stream is a list of traces, so you'll need to index this to extract a trace
-
     ## Use obspy.Stream methods of st_win to detrend and high-pass filter the data "in place".
+    tr_win.detrend()
+    tr_win.filter("highpass", freq=5)
     ## This means picking a good low corner frequency based on the data--take a look with PQL.
-    
+    window_rms = tr_win.std()
     ## Use the std method of tr_win and the "kurtosis" function imported from scipy.stats to update
     ## the output lists.
-    rms_list.append(window_rms) # fix this
-    kurtosis_list.append(window_kurtosis) # fix this
+    window_kurtosis = kurtosis(tr_win.data) # kurtosis needs numeric data
+    rms_list.append(window_rms) # good
+    kurtosis_list.append(window_kurtosis) # good
     mid_time_list.append((window_start_time + window_length_sec/2).datetime)
     ## FYI, obspy uses its own time class "UTCDateTime" because the default Python class "datetime"
     ## is only microsecond-precise. That happens to be good enough for us. Plot formatting is easier
@@ -64,7 +71,7 @@ while window_start_time < t2:
 
     ## finally, increment window_start_time
     window_start_time += (1-overlap) * window_length_sec
-
+#%%
 ## Done looping; convert the output lists into a more convenient format (numpy array)
 mid_time_list = np.array(mid_time_list)
 rms_list = np.array(rms_list)
@@ -76,7 +83,7 @@ plt.subplot(2,1,1)
 plt.plot(mid_time_list, rms_list, 'k.')
 
 ## make a second subplot with only the low-kurtosis windows plotted
-low_kurt = kurtosis_list < (-1 * kurtosis_list.min())
+low_kurt = kurtosis_list < 0.2# * kurtosis_list.min())
 plt.subplot(2,1,2)
 plt.plot(mid_time_list[low_kurt], rms_list[low_kurt], 'k.')
 plt.xlabel('Time')
