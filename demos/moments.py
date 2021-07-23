@@ -12,7 +12,8 @@ from scipy.stats import moment
 ## the moment function is the same as skew and kurtosis if you standardize the variable first and then subtract the expected value (0 or 3)
 st = obspy.read('/home/jake/Work/StreamAcoustics/BoiseRiver/2021_data/2021-04-10_AnnMorrison/mseed/2021-04-01T00_00_00..150..HDF.mseed')
 st.filter('highpass', freq = 5.0)
-t1 = obspy.UTCDateTime('2021-04-01T08:00:00')
+# t1 = obspy.UTCDateTime('2021-04-01T08:00:00') # quiet period
+t1 = obspy.UTCDateTime('2021-04-01T18:00:00') # noisy period
 st.trim(t1, t1 + 3*3600)
 
 
@@ -28,19 +29,31 @@ for i in range(1000):
     x = st[0].data[j1:(j1+1000)]
     m2[i] = (np.var(x))
     x = (x - x.mean()) / np.std(x)
-    m3[i] = (skew(x))
-    m4[i] = (kurtosis(x))
-    m5[i] = (moment(x, 5))
-    m6[i] = (moment(x, 6))
-    m7[i] = (moment(x, 7))
-    m8[i] = (moment(x, 8))
-w = (np.array(m4) < (-1 * np.quantile(m4, 0.01)))    
+    m3[i] = skew(x)
+    m4[i] = kurtosis(x)
+    m5[i] = moment(x, 5)
+    m6[i] = moment(x, 6)
+    m7[i] = moment(x, 7)
+    m8[i] = moment(x, 8)
+
+w = np.where(np.array(m4) < (-1 * np.quantile(m4, 0.01)))[0]
+for i, x in enumerate([m3, m4, m5, m6, m7, m8]):
+    print('moment %i' % (i+3))
+    print(np.corrcoef(m2, x)[0,1]) # pick an off-diagonal from the correlation matrix
+    print(np.corrcoef(m2[w], x[w])[0,1])
+
 plt.subplot(2,2,1); plt.plot(m3[w], m2[w], ',')
 plt.subplot(2,2,2); plt.plot(m4[w], m2[w], ',')
 plt.subplot(2,2,3); plt.plot(m5[w], m2[w], ',')
 plt.subplot(2,2,4); plt.plot(m6[w], m2[w], ',')
 
-for i, x in enumerate([m3, m4, m5, m6, m7, m8]):
-    print('moment %i' % (i+3))
-    print(np.corrcoef(m2, x)[0,1]) # pick an off-diagonal from the correlation matrix
-    print(np.corrcoef(m2[w], x[w])[0,1])
+
+## in the noisy period, window 192 is loud and has very low kurtosis. why is this?
+
+x = st[0].data[192000:193000]
+kurtosis(x)
+plt.plot(x)
+
+x2 = st[0].data[191000:192000]
+plt.plot(x2)
+kurtosis(x2)

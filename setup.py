@@ -6,19 +6,6 @@ except ImportError:
 
 
 import os
-use_cython = os.environ.get("USE_CYTHON", 'True').lower() != 'false'
-
-if use_cython:
-    try:
-        from Cython.Build import cythonize
-    except ImportError:
-        msg = (
-            'Could not import cython. Make sure cython is installed and a C '
-            'compiler is available and retry, or disable the C-extension with '
-            '`USE_CYTHON=False pip install gemlog`.'
-        )
-        raise RuntimeError(msg)
-
 from distutils.util import convert_path
 import sys
 
@@ -103,12 +90,9 @@ setuptools_kwargs = {
     'include_package_data': True,
 }
 
-PACKAGES = ['gemlog']
+PACKAGES = ['riversound']
 
-if use_cython:
-    ext_modules = cythonize("gemlog/parsers.pyx")
-else:
-    ext_modules = []
+ext_modules = []
 
 setup(name=DISTNAME,
       version=VERSION,
