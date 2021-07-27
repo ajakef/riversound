@@ -26,7 +26,7 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0, runmed_rad
         w = ~np.isnan(sg[0,:])
         sg[:,w] = median_filter(sg[:,w], kernel_size)
         
-    return {'specgram':sg, 'freqs':freqs, 'times':times, 'mean':np.nanmean(sg,1), 'median':np.nanmedian(sg,1)}
+    return {'specgram':sg, 'freqs':freqs, 'times':times, 'mean':np.nanmean(sg,1), 'median':np.nanmedian(sg,1), 'stdev': np.nanstd(sg, 1)}
     
 def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False):
     # Z rows are x, columns are y
@@ -35,7 +35,7 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
     if y is None:
         y = np.arange(Z.shape[1])
 
-    im = ax.pcolormesh(x, y, Z.T, vmin = zmin, vmax = zmax)#, cmap='YlOrRd')
+    im = ax.pcolormesh(x, y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
     if crosshairs:
         ax.hlines(0, x[0], x[-1], 'k', linewidth=0.5)
         ax.vlines(0, y[0], y[-1], 'k', linewidth=0.5)
