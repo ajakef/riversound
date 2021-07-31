@@ -60,4 +60,4 @@ for i in range(meanspec.shape[0]):
 
 plt.legend([t.strftime('%Y-%m-%d') for t in plot_times])
 plt.xlabel('Frequency (Hz)')
-plt.ylabel('Power (counts$^2$)')
+plt.ylabel('Power Spectral Density (counts$^2$/Hz)')
