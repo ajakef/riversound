@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 path_pattern = '/home/jake/Work/StreamAcoustics/Sawtooths/TrailCreek/2021-05-17/AM006/*_090000.WAV' # change to the files you want to read
 fn = sorted(glob.glob(path_pattern))
 
+if len(fn) == 0:
+    raise Exception('No matching files found! Double-check path_pattern')
+
 ## if needed, enter the times of day to trim data. These are used by later lines
 ## that can be commented or uncommented.
 start_hour = 2 + 6 # 6 is time zone difference vs UTC
