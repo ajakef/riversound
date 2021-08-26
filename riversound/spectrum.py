@@ -95,8 +95,36 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
     
 
 
-def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
-    # function must input a stream and return a dict
+def apply_function_windows(st, f, win_length_sec, overlap = 0.5):
+    """
+    Run an analysis (or suite of analyses) on overlapping windows for some dataset
+    
+    Parameters:
+    -----------
+    st : obspy.Stream
+    Stream including data to divide into windows and analyze
+
+    f : function
+    Accepts single variable "st" (obspy.Stream), returns dictionary of results
+
+    win_length_sec : float
+    Length of analysis windows [seconds]
+
+    overlap : float
+    Proportion of a window that overlaps with the previous window [unitless, 0-1]
+ 
+    Returns:
+    --------
+    dictionary with following items:
+    --t_mid (obspy.UTCDateTime): mean time of each window
+    --all elements of the output of "f", joined into numpy arrays
+
+    Note:
+    -----
+    For each time window, the stream is trimmed to fit, but not tapered, detrended, or otherwise 
+    processed. If those steps are necessary, be sure they are carried out in f().
+"""
+    # f must input a stream and return a dict
     eps = 1e-6
     t1 = st[0].stats.starttime
     t2 = st[0].stats.endtime
@@ -105,8 +133,8 @@ def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
     print(num_windows)
     for i in range(num_windows):
         win_start = t1 + i*(data_length_sec - win_length_sec) / (num_windows-1)
-        st_tmp = st.slice(win_start, win_start + win_length_sec - st[0].stats.delta*0.7)
-        win_dict = function(st_tmp)
+        st_tmp = st.slice(win_start-eps, win_start + win_length_sec - eps, nearest_sample = False)
+        win_dict = f(st_tmp)
         if i == 0:
             output_dict = {key:[] for key in win_dict.keys()}
             output_dict['t_mid'] = []
@@ -117,6 +145,30 @@ def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
     return output_dict
 
 def pgram(x, dt, type = 'power', onesided = True):
+    """
+    Calculate the periodogram of a signal, obeying Parseval's relation.
+    
+    Parameters:
+    -----------
+    x : numpy.array or list 
+    Time series to analyze
+
+    dt: float
+    time interval between samples (seconds)
+
+    type : string
+    type of spectrum to return; can be "power", "amplitude", or "dB"
+
+    onesided : boolean
+    if True, eliminate frequencies above Nyquist, and add their power to corresponding lower 
+    frequencies
+
+    Returns:
+    --------
+    Dict, with following elements:
+    --freqs: frequencies of output spectrum
+    --spectrum: output spectrum
+    """
     N = len(x)
     df = 1/(N*dt)
     power = np.abs(np.fft.fft(x))**2/N**2/df ## obeys Parseval's relation: df*sum(power) = mean(x^2)
@@ -139,4 +191,4 @@ def pgram(x, dt, type = 'power', onesided = True):
         raise Exception('type %s not supported' % type)
     ## parseval check: N = 10;dt = 0.0001;x = np.random.normal(0,1,N);np.sum(pgram(x, dt)['spectrum'] / (N*dt)) / np.mean(x**2)
 
-    return {'freqs':freq, 'spectrum':spec, 'type':type, 'spectrum_units':spec_units}
+    return {'freqs':freq, 'spectrum':spec}#, 'type':type, 'spectrum_units':spec_units}
