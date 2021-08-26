@@ -94,3 +94,25 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
     return im
     
 
+
+def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
+    # function must input a stream and return a dict
+    eps = 1e-6
+    t1 = st[0].stats.starttime
+    t2 = st[0].stats.endtime
+    data_length_sec = t2 - t1
+    num_windows = 1 + int(np.ceil((data_length_sec - win_length_sec) / (win_length_sec * (1 - overlap))))
+    print(num_windows)
+    for i in range(num_windows):
+        win_start = t1 + i*(data_length_sec - win_length_sec) / (num_windows-1)
+        st_tmp = st.slice(win_start, win_start + win_length_sec - eps)
+        win_dict = function(st_tmp)
+        if i == 0:
+            output_dict = {key:[] for key in win_dict.keys()}
+            output_dict['t_mid'] = []
+        for key in win_dict.keys():
+            output_dict[key].append(win_dict[key])
+        output_dict['t_mid'].append(win_start + win_length_sec/2)
+    output_dict = {key:np.array(output_dict[key]) for key in output_dict.keys()}
+    return output_dict
+
