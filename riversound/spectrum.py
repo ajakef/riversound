@@ -101,11 +101,11 @@ def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
     t1 = st[0].stats.starttime
     t2 = st[0].stats.endtime
     data_length_sec = t2 - t1
-    num_windows = 1 + int(np.ceil((data_length_sec - win_length_sec) / (win_length_sec * (1 - overlap))))
+    num_windows = 1 + int(np.ceil((data_length_sec - win_length_sec) / (win_length_sec * (1 - overlap)) - eps))
     print(num_windows)
     for i in range(num_windows):
         win_start = t1 + i*(data_length_sec - win_length_sec) / (num_windows-1)
-        st_tmp = st.slice(win_start, win_start + win_length_sec - eps)
+        st_tmp = st.slice(win_start, win_start + win_length_sec - st[0].stats.delta*0.7)
         win_dict = function(st_tmp)
         if i == 0:
             output_dict = {key:[] for key in win_dict.keys()}
@@ -116,3 +116,27 @@ def apply_function_windows(st, function, win_length_sec, overlap = 0.5):
     output_dict = {key:np.array(output_dict[key]) for key in output_dict.keys()}
     return output_dict
 
+def pgram(x, dt, type = 'power', onesided = True):
+    N = len(x)
+    df = 1/(N*dt)
+    power = np.abs(np.fft.fft(x))**2/N**2/df ## obeys Parseval's relation: df*sum(power) = mean(x^2)
+    freq = df * np.arange(N)
+    if onesided:
+        power[(freq > 0) & (freq < 0.5/dt)] *= 2 # don't double f = 0 or Nyquist
+        power = power[freq <= 0.5/dt]
+        freq = freq[freq <= 0.5/dt]
+    ## decide what kind of spectrum to return (default "power")
+    if type.lower() == 'power':
+        spec = power
+        spec_units = 'Pa^2/Hz'
+    elif type.lower()[:3] == 'amp':
+        spec = np.sqrt(power)
+        spec_units = 'Pa/sqrt(Hz)'
+    elif type.lower() == 'db':
+        spec = 10*np.log10(power)
+        spec_units = 'dB Pa/sqrt(Hz)'
+    else:
+        raise Exception('type %s not supported' % type)
+    ## parseval check: N = 10;dt = 0.0001;x = np.random.normal(0,1,N);np.sum(pgram(x, dt)['spectrum'] / (N*dt)) / np.mean(x**2)
+
+    return {'freqs':freq, 'spectrum':spec, 'type':type, 'spectrum_units':spec_units}
