@@ -34,3 +34,18 @@ def test_spectrum_parseval():
     assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
 
     
+## check that the pgram function obeys Parseval's relation for power:
+## integral of the spectrum = mean of squared time-domain signal
+def test_spectrum_parseval():
+    tr = obspy.Trace(np.random.normal(0, 1, 1000000))
+    tr.stats.sampling_rate = 100.0
+    tr.filter('highpass', freq = 1.0)
+    ## calculate spectrum using an infinite kurtosis threshold (never exclude
+    ## a window as suspected noise) and a rectangular window to keep it simple
+    spectrum_info = pgram(tr, 0.01)
+    psd = spectrum_info['spectrum']
+    df = np.diff(spectrum_info['freqs'])[0]
+    freq_domain_power = np.sum(psd[1:]) * df # integral of spectrum
+    time_domain_power = tr.std()**2 # mean of squares
+    print(freq_domain_power/ time_domain_power-1)
+    assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
