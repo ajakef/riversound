@@ -1,7 +1,6 @@
 import riversound, glob, obspy
 import numpy as np
 import matplotlib.pyplot as plt
-plt.style.use('tableau-colorblind10')
 #%matplotlib qt # probably not needed
 
 ## FFT works best when data length is a power of 2, so use this function to help determine window size.
