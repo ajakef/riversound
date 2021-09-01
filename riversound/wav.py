@@ -19,7 +19,7 @@ def write_wav(tr, filename = None, time_format = '%Y-%m-%dT%H_%M_%S', path = '.'
     wavfile.write(path + '/' + filename, int(tr.stats.sampling_rate), tr.data)
 
 
-def read_audiomoth(filename, network = '', station = '', location = '', channel = 'GDF'):
+def read_audiomoth(filename, network = '', station = '', location = '', channel = 'GDF', remove_response = True):
     # channel code: G means sample rate 1000-5000 Hz, corner period < 10 sec. This is the closest SEED code allowed; it does not support fs > 5000 Hz.
     datetime_str = filename.split('/')[-1].split('\\')[-1].split('.')[0]
     #(date_str, time_str) = datetime_str.split('_')
@@ -33,9 +33,26 @@ def read_audiomoth(filename, network = '', station = '', location = '', channel 
     tr.stats.network = network
     tr.stats.station = station
     tr.stats.location = location
+
+    if remove_response:
+        # following VERY ROUGH sensitivity estimate taken from assumptions below
+    ## need to replace this with a real response
+        adc_bitweight = 1.25/2**12
+        gain = 10**(30.6/20)
+        mic_sensitivity = 10**(-38/20)
+        pa_per_count = adc_bitweight / (gain * mic_sensitivity) * 0.03
+        tr.data = tr.data * pa_per_count
+
     return tr
 
-    
+
+## audiomoth response:
+# Wonder Gecko ADC (p.886): 12-bit (?), full scale is probably 1.25 or 2.5 V https://www.silabs.com/documents/public/reference-manuals/EFM32WG-RM.pdf
+# pre-amp gain in dB (what you set in config): low 27.2 mid 30.6 high 32.0 https://raw.githubusercontent.com/OpenAcousticDevices/Datasheets/main/AudioMoth_Dev_Datasheet.pdf
+# above conflicts with this: https://www.openacousticdevices.info/support/configuration-support/how-many-db-audiomoth-records-high-gain-mode
+# mic sensitivity: -38 dBV/Pa https://raw.githubusercontent.com/OpenAcousticDevices/Datasheets/main/AudioMoth_Dev_Datasheet.pdf
 #tr = read_audiomoth('/home/jake/Work/StreamAcoustics/BoiseRiver/2021_data/2021-05-05_AnnMorrison/AM003/20210505_090000.WAV')
+
+
 #tr.trim(tr.stats.starttime, tr.stats.starttime + 1)
 #tr.spectrogram(log = True, dbscale = True)

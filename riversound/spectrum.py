@@ -79,18 +79,46 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0,
         sg[:,w] = median_filter(sg[:,w], kernel_size)
         
     return {'specgram':sg, 'freqs':freqs, 'times':times, 'mean':np.nanmean(sg,1), 'median':np.nanmedian(sg,1), 'stdev': np.nanstd(sg, 1)}
-    
-def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False):
+
+def round_sig(f, p): # thanks StackOverflow denizb
+    f = np.array(f)
+    return np.array([float(('%.' + str(p) + 'e') % ff) for ff in f])
+
+def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False, log_x = False, log_y = False):
     # Z rows are x, columns are y
     if x is None:
         x = np.arange(Z.shape[0])
     if y is None:
         y = np.arange(Z.shape[1])
 
-    im = ax.pcolormesh(x, y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
+    if log_x:
+        w = x > 0
+        plot_x = np.log10(x[w])
+        x = x[w]
+        Z = Z[:,w]
+    else:
+        plot_x = x
+
+    if log_y:
+        w = y > 0
+        plot_y = np.log10(y[w])
+        y = y[w]
+        Z = Z[:,w]
+    else:
+        plot_y = y
+        
+    im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
     if crosshairs:
         ax.hlines(0, x[0], x[-1], 'k', linewidth=0.5)
         ax.vlines(0, y[0], y[-1], 'k', linewidth=0.5)
+    if log_x and (ax is plt):
+        xt = round_sig(10**plt.xticks()[0],0)
+        xt = xt[(np.log10(xt) > plt.xlim()[0]) & (np.log10(xt) < plt.xlim()[1])]
+        plt.xticks(np.log10(xt), xt)
+    if log_y and (ax is plt):
+        yt = round_sig(10**plt.yticks()[0],0)
+        yt = yt[(np.log10(yt) > plt.ylim()[0]) & (np.log10(yt) < plt.ylim()[1])]
+        plt.yticks(np.log10(yt), yt)
     return im
     
 
