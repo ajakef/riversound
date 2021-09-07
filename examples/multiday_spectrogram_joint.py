@@ -39,7 +39,7 @@ for i in range(n_days):
     current_day = day1 + i*86400
     t1 = current_day.replace(hour = start_hour)
     t2 = current_day.replace(hour = end_hour)
-    tr_infrasound, tr_audible = read_infrasound_audible(t1, t2, path_infrasound, path_audible)
+    tr_infrasound, tr_audible = riversound.read_infrasound_audible(t1, t2, path_infrasound, path_audible)
     nfft_infrasound = next_power_2(10 / tr_infrasound.stats.delta) # >10-sec windows for freq resolution finer than 0.1 Hz
     nfft_audible = next_power_2(0.1 / tr_audible.stats.delta) # >0.1-sec windows for freq res finer than 10 Hz
 
