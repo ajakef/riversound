@@ -74,16 +74,21 @@ medspec_audible = np.array(medspec_audible)[:,w]
 
 ## plot the spectrogram and power
 plt.figure()
-plt.subplot(2,1,1)
+plt.subplot(3,1,1)
 riversound.image(np.log10(meanspec_audible), plot_times, freqs_audible, crosshairs = False, log_y = True)
 riversound.image(np.log10(meanspec_infrasound), plot_times, freqs_infrasound, crosshairs = False, log_y = True)
 plt.yticks(np.arange(5), 10**np.arange(5))
 plt.ylabel('Frequency (Hz)')
-plt.subplot(2,1,2)
+plt.subplot(3,1,2)
 plt.semilogy(plot_times, power_infrasound)
 plt.semilogy(plot_times, power_audible)
 plt.ylabel('Power (Pa$^2$)')
 plt.legend(['Infrasound', 'Audible'])
+
+plt.subplot(3,1,3)
+plt.plot(time, discharge)
+#plt.semilogy(time,discharge)
+plt.xlim(plot_times[0], plot_times[-1])
 
 ## plot the daily spectra
 plt.figure()

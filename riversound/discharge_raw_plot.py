@@ -51,19 +51,13 @@ def read_discharge(sitenum,start_time,end_time):
     t = t.dt.tz_convert('UTC')
     return [t,q]
 #%%
-sitenum ='13206000'
-start_time= '2021-05-24T00:00:00.000-06:00'
-end_time= '2021-06-12T23:59:59.999-06:00'
-t,q = read_discharge(sitenum,start_time,end_time)
+#sitenum ='13206000'
+#start_time= '2021-05-24T00:00:00.000-06:00'
+#end_time= '2021-06-12T23:59:59.999-06:00'
+#t,q = read_discharge(sitenum,start_time,end_time)
 
-plt.figure(1)
-plt.plot(t,q)
-plt.xlabel('Time')
-plt.ylabel('Discharge (m^3/s)')
-plt.title('Gauged Discharge')
-
-
-
-#In [12]: 'filledinvalue %s something' % '12345'
-#Out[12]: 'filledinvalue 12345 something'
-#give function station number, then do start and end times
+#plt.figure(1)
+#plt.plot(t,q)
+#plt.xlabel('Time')
+#plt.ylabel('Discharge (m^3/s)')
+#plt.title('Gauged Discharge')

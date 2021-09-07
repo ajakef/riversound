@@ -42,7 +42,6 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible):
     ## or set the outputs this way to package both traces in one stream
     st = read_infrasound_audible(t1, t2, path_infrasound, path_audible)
     """
-    breakpoint()
     ## download the instrument response from the IRIS Nominal Response Library
     from obspy.clients.nrl import NRL
     nrl = NRL()
