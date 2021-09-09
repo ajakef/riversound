@@ -38,7 +38,7 @@ def read_discharge(sitenum,start_time,end_time):
             """
             
     if sitenum.lower() == 'glenwood':
-        sitenum == '13206000'
+        sitenum = '13206000'
     elif sitenum.lower() == 'darby':
         sitenum = '12344000'
     url = f'https://waterservices.usgs.gov/nwis/iv/?sites={sitenum}&parameterCd=00060&startDT={start_time}&endDT={end_time}&siteStatus=all&format=rdb' # f ensures parsing of braces
