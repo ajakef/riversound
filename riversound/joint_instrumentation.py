@@ -3,7 +3,7 @@ import numpy as np
 from riversound.wav import read_audiomoth
 import matplotlib.pyplot as plt
 
-def read_infrasound_audible(t1, t2, path_infrasound, path_audible):
+def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound = '*.*.*.*', id_audible = '*.*.*.*'):
     """
     For a given start and end time, read both an infrasound miniSEED file and audible .WAV file.
 
@@ -20,6 +20,13 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible):
 
     path_audible : str
     Folder that contains audible .WAV data
+
+    id_infrasound : str
+    SEED code (network.station.location.channel) used to select infrasound data (default allows any)
+
+    id_audible : str
+    SEED code (network.station.location.channel) used to select audible data (default allows any)
+
 
     Returns:
     --------
@@ -69,6 +76,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible):
     for i in range(len(fn_infrasound)):
         if (file_start_infrasound[i] <= t2) and (file_end_guess_infrasound[i] >= t1):
             st_infrasound += obspy.read(fn_infrasound[i])[0]
+    st_infrasound = st_infrasound.select(id = id_infrasound)
     st_infrasound.trim(t1, t2, nearest_sample = False)
     st_infrasound.merge()
     for tr in st_infrasound:
@@ -80,6 +88,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible):
     for i in range(len(fn_audible)):
         if (file_start_audible[i] < t2) and (file_end_guess_audible[i] > t1):
             st_audible += read_audiomoth(fn_audible[i], remove_response = True)
+    st_audible = st_audible.select(id = id_audible)
     st_audible.trim(t1, t2, nearest_sample = False)
     ## definitely don't merge the audible traces if you record 30-sec files every hour!
     
