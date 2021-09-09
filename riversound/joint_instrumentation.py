@@ -2,6 +2,7 @@ import glob, obspy
 import numpy as np
 from riversound.wav import read_audiomoth
 import matplotlib.pyplot as plt
+import gemlog
 
 def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound = '*.*.*.*', id_audible = '*.*.*.*'):
     """
@@ -49,12 +50,6 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
     ## or set the outputs this way to package both traces in one stream
     st = read_infrasound_audible(t1, t2, path_infrasound, path_audible)
     """
-    ## download the instrument response from the IRIS Nominal Response Library
-    from obspy.clients.nrl import NRL
-    nrl = NRL()
-    gem_response = nrl.get_response(sensor_keys = ['Gem', 'Gem Infrasound Sensor v1.0'],
-	   		    datalogger_keys = ['Gem', 'Gem Infrasound Logger v1.0',
-			    '0 - 128000 counts/V']) # may cause warning--ok to ignore
     
     eps = 1e-6
     t1 = obspy.UTCDateTime(t1)
@@ -79,10 +74,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
     st_infrasound = st_infrasound.select(id = id_infrasound)
     st_infrasound.trim(t1, t2, nearest_sample = False)
     st_infrasound.merge()
-    for tr in st_infrasound:
-        tr.stats.response = gem_response
-    st_infrasound.remove_response()
-
+    st_infrasound = gemlog.deconvolve_gem_response(st_infrasound)
 
     st_audible = obspy.Stream()
     for i in range(len(fn_audible)):

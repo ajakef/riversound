@@ -1,6 +1,5 @@
 import numpy as np
-import pytest, shutil, os, obspy
-from riversound.wav import * # this will have to change once we properly package the repo
+import pytest, shutil, os, obspy, riversound 
 
 ## set up the temporary folder for running the tests
 def setup_module():
@@ -18,9 +17,10 @@ def teardown_module():
 
 def test_read_audiomoth():
     ## check that the function reads a wav file to an obspy trace without error
-    tr = read_audiomoth('../data/20210414_060000.WAV', station = 'AM', location = '00')
+    #print(os.getcwd())
+    tr = riversound.read_audiomoth('../data/audiomoth/20210414_060000.WAV', station = 'AM', location = '00')
 
     ## check that the output trace has the correct start time
     assert tr.stats.starttime == obspy.UTCDateTime('20210414_0600')
     ## check that it can be written to an output file without error
-    write_wav(tr, path = '../tmp/')
+    riversound.write_wav(tr, path = '../tmp/')

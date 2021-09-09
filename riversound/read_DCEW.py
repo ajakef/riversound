@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def read_DCEW(filename = '/home/jake/Work/StreamAcoustics/DCEW/LG_StreamHrlySummary_2021.csv', skiprows = 18, na_values = '#NUM!', encoding = 'utf-7'):
     """
@@ -26,10 +27,9 @@ def read_DCEW(filename = '/home/jake/Work/StreamAcoustics/DCEW/LG_StreamHrlySumm
     """
     
     ## use indices instead of column names in case column names are encoded wrong (likely)
-    breakpoint()
     df = pd.read_csv(filename, encoding_errors = 'ignore', skiprows = skiprows, sep = ',', encoding = encoding, na_values = na_values)
     t = pd.to_datetime(df.iloc[:,0], format='%m/%d/%Y %H:%M')
-    t = t.dt.tz_localize('America/Boise')
+    t = t.dt.tz_localize('-06:00')
     t = t.dt.tz_convert('UTC')
     t = np.array([i.to_pydatetime() for i in t])
     return t, df.iloc[:,1] * 0.001

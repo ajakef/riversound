@@ -12,6 +12,7 @@ Created on Tue Aug 10 11:40:42 2021
 ## The "Classic" USGS Water Data pages will be discontinued (in favor of a new "Monitoring Location" site) in 2023--just when Scott should be writing up, and when disruptions will be most unwelcome. However, the "waterservices.usgs.gov" link shown above will still work with the fancy new website. So the code below should be safe.
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import io
 import requests
@@ -31,10 +32,10 @@ def read_discharge(sitenum,start_time,end_time):
         
         Example:
             start_time = '2021-05-24T00:00:00.000-06:00'
-            end_time= '2021-06-12T23:59:59.999-06:00'
+            end_time = '2021-06-12T23:59:59.999-06:00'
             sitenum ='glenwood'
             
-            t,q = read_discharge(sitenum, start_time, end_time)
+            t,q = riversound.read_discharge(sitenum, start_time, end_time)
             """
             
     if sitenum.lower() == 'glenwood':
@@ -46,7 +47,6 @@ def read_discharge(sitenum,start_time,end_time):
     s = requests.get(url).content
     parse_dates = ['20d']
     c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=27,delimiter='\t',parse_dates=['20d'])
-    print(c) 
     t = c['20d']
     q = c['14n']
     
@@ -54,6 +54,7 @@ def read_discharge(sitenum,start_time,end_time):
     
     t = t.dt.tz_localize('America/Boise')
     t = t.dt.tz_convert('UTC')
+    t = np.array([i.to_pydatetime() for i in t])
     return [t,q]
 #%%
 #sitenum ='13206000'
