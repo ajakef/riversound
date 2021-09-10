@@ -15,16 +15,24 @@ def teardown_module():
     os.chdir('..')
     shutil.rmtree('tmp') 
 
-#path = '/home/jake/Work/StreamAcoustics/Sawtooths/TrailCreek/2021-05-17/'
+## Run tests on read_infrasound_audible using data packaged in the repository
 def test_read_infrasound_audible():
+    ## set up function inputs
     path = '../data/'
     path_infrasound = path + 'mseed'
     path_audio = path + 'audiomoth'
     t1 = obspy.UTCDateTime('2021-04-14T06_00_00')
     t2 = obspy.UTCDateTime('2021-04-14T07_00_00')
+
+    ## make sure the function runs without error
     st = riversound.read_infrasound_audible(t1, t2, path_infrasound, path_audio)
+
+    # check that the function outputs are correct
+    assert len(st) == 2 # the output should have two traces
     
-    assert len(st) == 2
-    assert len(st.select(station='')[0].data) == (30*48000)
+    # the infrasound trace should have the right length (3600 sec * 100 Hz sample rate)
     assert len(st.select(station='128')[0].data) == (3600*100)
+    
+    # the audible trace should have the right length (30 sec * 48 kHz sample rate)
+    assert len(st.select(station='')[0].data) == (30*48000)
 

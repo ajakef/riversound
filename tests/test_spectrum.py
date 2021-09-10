@@ -18,31 +18,42 @@ def teardown_module():
 
 
 ## check that the spectrum function obeys Parseval's relation for power:
-## integral of the spectrum = mean of squared time-domain signal
+## integral of the spectrum = mean of squared time-domain signal.
+## This also checks that the function runs without error when given good inputs.
 def test_spectrum_parseval():
+    ## create an obspy trace filled with random data for testing
     tr = obspy.Trace(np.random.normal(0, 1, 1000000))
     tr.stats.sampling_rate = 100.0
+
+    ## filter the trace above 1 Hz
     tr.filter('highpass', freq = 1.0)
+    
     ## calculate spectrum using an infinite kurtosis threshold (never exclude
-    ## a window as suspected noise) and a rectangular window to keep it simple
+    ## a window as suspected noise) and a rectangular window to keep it simple.
     spectrum_info = spectrum(tr, kurtosis_threshold=1e16, nfft = 4096, window = 'boxcar')
+
+    ## calculate power in both the time and frequency domain, and ensure that they are equal
     psd = spectrum_info['mean']
     df = np.diff(spectrum_info['freqs'])[0]
     freq_domain_power = np.sum(psd[1:]) * df # integral of spectrum
     time_domain_power = tr.std()**2 # mean of squares
-    print(freq_domain_power/ time_domain_power-1)
+    #print(freq_domain_power/ time_domain_power-1)
     assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
 
     
 ## check that the pgram function obeys Parseval's relation for power:
 ## integral of the spectrum = mean of squared time-domain signal
-def test_spectrum_parseval():
+## pgram ("periodogram") is the simple single Fourier transform. spectrum is the advanced one for
+## averaged spectral estimates involving removal of noisy time periods (e.g., via kurtosis)
+def test_pgram_parseval():
     tr = obspy.Trace(np.random.normal(0, 1, 1000000))
     tr.stats.sampling_rate = 100.0
     tr.filter('highpass', freq = 1.0)
     ## calculate spectrum using an infinite kurtosis threshold (never exclude
     ## a window as suspected noise) and a rectangular window to keep it simple
     spectrum_info = pgram(tr, 0.01)
+
+    # calculate power in the time and frequency domains to make sure they're equal.
     psd = spectrum_info['spectrum']
     df = np.diff(spectrum_info['freqs'])[0]
     freq_domain_power = np.sum(psd[1:]) * df # integral of spectrum
