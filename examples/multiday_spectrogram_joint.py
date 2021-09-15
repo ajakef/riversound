@@ -1,19 +1,19 @@
 import riversound, glob, obspy
 import numpy as np
 import matplotlib.pyplot as plt
-#%matplotlib qt # probably not needed
+%matplotlib qt
 
 ## FFT works best when data length is a power of 2, so use this function to help determine window size.
 def next_power_2(x):
     return int(2**np.ceil(np.log2(x)))
 
 ## define paths containing infrasound and audible data
-path = '/home/jake/Work/StreamAcoustics/Sawtooths/TrailCreek/2021-05-17/'
+path = '/data/jakeanderson/2021_Boise_River/long_term/DivDam/2021-05-25_DiversionDam/'
 path_infrasound = path + 'mseed'
-path_audible = path + 'AM006'
+path_audible = path + 'AM005'
 
-day1 = obspy.UTCDateTime('2021-05-10')
-day2 = obspy.UTCDateTime('2021-05-17')
+day1 = obspy.UTCDateTime('2021-05-03')
+day2 = obspy.UTCDateTime('2021-05-25')
 n_days = int(np.round((day2 - day1)/86400)) # length of study period in days
 
 ## Enter the times of day (UTC) to read data from.
@@ -45,7 +45,7 @@ for i in range(n_days):
 
     print([i, current_day, tr_infrasound, tr_audible])
     
-    plot_times[i] = current_day
+    plot_times[i] = current_day.datetime
 
     ## infrasound
     tr_infrasound.filter('highpass', freq = 1, zerophase = True)
@@ -77,12 +77,14 @@ plt.figure()
 plt.subplot(3,1,1) # discharge
 t, q = riversound.read_discharge('glenwood', plot_times[0], plot_times[-1])
 plt.plot(t, q)
-#plt.semilogy(time,discharge)
+plt.semilogy(t,q)
 plt.xlim(plot_times[0], plot_times[-1])
+plt.ylabel('discharge [m^3/s]')
 
 plt.subplot(3,1,2) # power
 plt.semilogy(plot_times, power_infrasound)
 plt.semilogy(plot_times, power_audible)
+# plt.xlim(plot_times[0], plot_times[-1]) # get this time series correlated with 3,1,1
 plt.ylabel('Power (Pa$^2$)')
 plt.legend(['Infrasound', 'Audible'])
 
@@ -94,10 +96,12 @@ plt.ylabel('Frequency (Hz)')
 
 ## plot the daily spectra
 plt.figure()
+num_colors = len(plt.rcParams['axes.prop_cycle'].by_key()['color'])
 for i in range(n_days):
-    col = plt.rcParams['axes.prop_cycle'].by_key()['color'][i]
+    col = plt.rcParams['axes.prop_cycle'].by_key()['color'][i%num_colors]
     plt.loglog(freqs_infrasound, meanspec_infrasound[i,:], color = col)
     plt.loglog(freqs_audible, meanspec_audible[i,:], color = col, label = plot_times[i].strftime('%Y-%m-%d'))
 plt.legend() # uses labels from plt.loglog
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Power Spectral Density (counts$^2$/Hz)')
+

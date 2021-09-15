@@ -68,7 +68,8 @@ def read_discharge(sitenum,start_time,end_time):
             
             t,q = riversound.read_discharge(sitenum, start_time, end_time)
             """
-            
+    start_time = _reformat_time(start_time)
+    end_time = _reformat_time(end_time)
     if sitenum.lower() == 'glenwood':
         sitenum = '13206000'
     elif sitenum.lower() == 'darby':
@@ -87,6 +88,18 @@ def read_discharge(sitenum,start_time,end_time):
     t = t.dt.tz_convert('UTC')
     t = np.array([i.to_pydatetime() for i in t])
     return [t,q]
+
+
+
+
+def _reformat_time(t):
+    if (type(t) is obspy.UTCDateTime) or (type(t) is datetime.datetime):
+        return t.isoformat()
+    elif type(t) is str:
+        return obspy.UTCDateTime(t).isoformat()
+    else:
+        raise TypeError('Input time must be str, UTCDateTime, or datetime.datetime')
+    
 #%%
 #sitenum ='13206000'
 #start_time= '2021-05-24T00:00:00.000-06:00'
