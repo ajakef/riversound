@@ -1,7 +1,7 @@
-import riversound, glob, obspy
+import riversound, glob, obspy, matplotlib
 import numpy as np
+matplotlib.use('qt',warn=False, force=True) # needed when running in ipython terminal instead of spyder. if this doesn't work, run '%matplotlib qt' instead.
 import matplotlib.pyplot as plt
-%matplotlib qt
 
 ## FFT works best when data length is a power of 2, so use this function to help determine window size.
 def next_power_2(x):
