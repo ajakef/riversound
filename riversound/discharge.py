@@ -80,9 +80,10 @@ def read_discharge(sitenum,start_time,end_time):
     print(url)
     s = requests.get(url).content
     parse_dates = ['20d']
-    c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=27,delimiter='\t',parse_dates=['20d'])
-    t = c['20d']
-    q = c['14n']
+    #c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=27,delimiter='\t',parse_dates=['20d'])
+    c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=0,delimiter='\t', comment = '#').iloc[1:,:] # using comments instead of skipped rows to make it less sensitive to web page format
+    t = pd.to_datetime(c.iloc[:,2])
+    q = c.iloc[:,4].astype(float)
     
     q = q/3.28084**3 # convert from ft to m cubed per second 
     
