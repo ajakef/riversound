@@ -61,8 +61,12 @@ def test_pgram_parseval():
     print(freq_domain_power/ time_domain_power-1)
     assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
 
+
+## check that find_peak_freq gives the right result when given simple input
 def test_find_peak_freq():
     sg = np.array([[1,1,3], # time 0
                    [2,3,0], # time 1
                    [3,2,0]])# time 2
     assert find_peak_freq(sg, freqmin = 0) == [2,1,0]
+    assert find_peak_freq(sg, freqmin = 1) == [2,1,1]
+    assert find_peak_freq(sg, freqmin = 0, freqmax = 1) == [0,1,0]

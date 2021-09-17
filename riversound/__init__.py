@@ -1,5 +1,5 @@
 from riversound.wav import read_audiomoth, write_wav
-from riversound.spectrum import spectrum, image, apply_function_windows, pgram
+from riversound.spectrum import spectrum, image, apply_function_windows, pgram, find_peak_freq
 from riversound.joint_instrumentation import read_infrasound_audible
 from riversound.discharge import read_discharge, read_DCEW
 #from gemlog.gemlog import Convert, ReadGem, convert, read_gem, get_gem_specs
