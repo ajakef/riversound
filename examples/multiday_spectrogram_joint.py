@@ -132,8 +132,8 @@ plt.legend(['Infrasound', 'Audible'])
 plt.xticks([])
 
 plt.subplot(3,1,3) # spectrogram
-riversound.image(np.log10(meanspec_audible), times_audible, freqs_audible, crosshairs = False, log_y = True)
-riversound.image(np.log10(meanspec_infrasound), times_infrasound, freqs_infrasound, crosshairs = False, log_y = True)
+riversound.image(np.log10(medspec_audible), times_audible, freqs_audible, crosshairs = False, log_y = True)
+riversound.image(np.log10(medspec_infrasound), times_infrasound, freqs_infrasound, crosshairs = False, log_y = True)
 plt.xlim(xlim[0], xlim[1])
 plt.yticks(np.arange(5), 10**np.arange(5))
 plt.ylabel('Frequency (Hz)')
@@ -150,3 +150,16 @@ plt.legend() # uses labels from plt.loglog
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Power Spectral Density (counts$^2$/Hz)')
 
+## plot the power rating curves
+plt.figure()
+plt.loglog(interp_times(times_infrasound, t, q), power_infrasound, 'b.-')
+plt.loglog(interp_times(times_audible, t, q), power_audible, 'r.-')
+
+def find_peak_freq(sg, freqs, freqmin = 2):
+    sg = sg[:,freqs >= freqmin]
+    freqs = freqs[freqs >= freqmin]
+    return freqs[sg.argmax(1)]
+
+plt.figure()
+plt.loglog(interp_times(times_infrasound, t, q), find_peak_freq(meanspec_infrasound, freqs_infrasound, 10), 'b.-')
+plt.loglog(interp_times(times_audible, t, q), find_peak_freq(meanspec_infrasound, freqs_audible, 10), 'r.-')

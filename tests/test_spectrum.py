@@ -60,3 +60,9 @@ def test_pgram_parseval():
     time_domain_power = tr.std()**2 # mean of squares
     print(freq_domain_power/ time_domain_power-1)
     assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
+
+def test_find_peak_freq():
+    sg = np.array([[1,1,3], # time 0
+                   [2,3,0], # time 1
+                   [3,2,0]])# time 2
+    assert find_peak_freq(sg) == [2,1,0]

@@ -79,9 +79,14 @@ def read_discharge(sitenum,start_time,end_time):
     url = f'https://waterservices.usgs.gov/nwis/iv/?sites={sitenum}&parameterCd=00060&startDT={start_time}&endDT={end_time}&siteStatus=all&format=rdb' # f ensures parsing of braces
     print(url)
     s = requests.get(url).content
-    parse_dates = ['20d']
+    #parse_dates = ['20d']
     #c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=27,delimiter='\t',parse_dates=['20d'])
-    c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=0,delimiter='\t', comment = '#').iloc[1:,:] # using comments instead of skipped rows to make it less sensitive to web page format
+    # This line has to be able to read any data page provided by USGS, and they don't all have the
+    # same number of comment lines. Further, after the comments, they have a header line followed
+    # by a line of opaque codes, followed by actual data. So, rather than skipping a fixed number
+    # of lines, we have to provide a comment character '#', read all the lines after the comment,
+    # exclude the bad first line, and finally parse the results.
+    c= pd.read_csv(io.StringIO(s.decode('utf-8')),skiprows=0,delimiter='\t', comment = '#').iloc[1:,:] 
     t = pd.to_datetime(c.iloc[:,2])
     q = c.iloc[:,4].astype(float)
     

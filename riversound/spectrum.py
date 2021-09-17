@@ -223,3 +223,49 @@ def pgram(x, dt, type = 'power', onesided = True):
     ## parseval check: N = 10;dt = 0.0001;x = np.random.normal(0,1,N);np.sum(pgram(x, dt)['spectrum'] / (N*dt)) / np.mean(x**2)
 
     return {'freqs':freq, 'spectrum':spec}#, 'type':type, 'spectrum_units':spec_units}
+
+
+def find_peak_freq(sg, freqs = None, freqmin = 2, freqmax = 10000):
+    """Find the peak frequency for each time in a spectrogram
+    
+    Parameters:
+    -----------
+    sg : 2-d numpy.array
+    Spectrogram to analyze (each row is a different time, each column is a different freq)
+
+    freqs : list or 1-d numpy.array
+    Frequencies corresponding to columns in sg; default is np.arange(sg.shape[1])
+
+    freqmin : float
+    Minimum frequency to consider (Hz)
+
+    freqmax : float
+    Maximum frequency to consider (Hz)
+
+    Returns:
+    --------
+    1-d numpy.array of length sg.shape[0] containing peak frequencies for all times
+
+    Note:
+    -----
+    If any row in sg is all zero or NaN, np.nan will be returned as that time's peak frequency
+    """
+    if freqs is None:
+        freqs = np.arange(sg.shape[1])
+    freqs = np.array(freqs)
+    
+    ## limit freqs and sg to the freqmin-freqmax range
+    w = (freqs >= freqmin) & (freqs <= freqmax)
+    sg = sg[:,w]
+    freqs = freqs[w]
+
+    ## loop through all times and calculate peak frequency
+    peakfreqs = []
+    for i in range(sg.shape[0]):
+        j = sg[i,:].argmax()
+        # if the row has bad data, call its peak frequency NaN
+        if (sg[i,j] == 0) or np.isnan(sg[i,j]):
+            peakfreqs.append(np.nan) 
+        else: ## otherwise return the peak frequency
+            peakfreqs.append(freqs[j])
+    return peakfreqs
