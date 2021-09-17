@@ -58,6 +58,9 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0,
     plt.loglog(spec_dict['freqs'], spec_dict['mean'])
 
     """
+    if len(tr.data) == 0:
+        return {'specgram':np.zeros([nfft,1]), 'freqs':np.arange(nfft), 'times':np.array([0]), 'mean':np.zeros(nfft), 'median':np.zeros(nfft), 'stdev': np.zeros(nfft)}
+    
     if criterion_function == 'default':
         def criterion_function(x): return kurtosis(x) < kurtosis_threshold
     
