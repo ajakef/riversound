@@ -119,7 +119,7 @@ plt.subplot(3,1,1) # discharge
 t, q = riversound.read_discharge('glenwood', xlim[0] - datetime.timedelta(days=1), xlim[1] + datetime.timedelta(days=1))
 plt.semilogy(t,q)
 plt.semilogy(times_infrasound + times_audible, interp_times(times_infrasound+times_audible, t, q), 'k.')
-
+plt.xticks([])
 plt.xlim(xlim[0], xlim[1])
 plt.ylabel('discharge (m$^3$/s)')
 
@@ -129,6 +129,7 @@ plt.semilogy(times_audible, power_audible)
 plt.xlim(xlim[0], xlim[1])
 plt.ylabel('Power (Pa$^2$)')
 plt.legend(['Infrasound', 'Audible'])
+plt.xticks([])
 
 plt.subplot(3,1,3) # spectrogram
 riversound.image(np.log10(meanspec_audible), times_audible, freqs_audible, crosshairs = False, log_y = True)
@@ -136,6 +137,7 @@ riversound.image(np.log10(meanspec_infrasound), times_infrasound, freqs_infrasou
 plt.xlim(xlim[0], xlim[1])
 plt.yticks(np.arange(5), 10**np.arange(5))
 plt.ylabel('Frequency (Hz)')
+plt.tight_layout()
 
 ## plot the daily spectra
 plt.figure()

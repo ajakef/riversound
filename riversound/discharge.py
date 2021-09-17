@@ -85,7 +85,8 @@ def read_discharge(sitenum,start_time,end_time):
     t = pd.to_datetime(c.iloc[:,2])
     q = c.iloc[:,4].astype(float)
     
-    q = q/3.28084**3 # convert from ft to m cubed per second 
+    q = q/3.28084**3 # convert from ft to m cubed per second
+    q = np.array(q)
     
     t = t.dt.tz_localize('America/Boise')
     t = t.dt.tz_convert('UTC')

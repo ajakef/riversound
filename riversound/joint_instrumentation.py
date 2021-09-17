@@ -91,7 +91,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
         print('No audible files found for these times')
         st_audible = obspy.Stream(obspy.Trace())
         
-    return st_infrasound[0], st_audible[0]
+    return obspy.Stream([st_infrasound[0], st_audible[0]])
 
 ## Helper function to find a data file's start time from its file name.
 def _find_file_start(filename):
