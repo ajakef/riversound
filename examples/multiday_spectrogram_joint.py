@@ -150,16 +150,17 @@ plt.legend() # uses labels from plt.loglog
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Power Spectral Density (counts$^2$/Hz)')
 
-## plot the power rating curves
+## plot discharge vs sound power
 plt.figure()
 plt.loglog(interp_times(times_infrasound, t, q), power_infrasound, 'b.-')
 plt.loglog(interp_times(times_audible, t, q), power_audible, 'r.-')
-
-def find_peak_freq(sg, freqs, freqmin = 2):
-    sg = sg[:,freqs >= freqmin]
-    freqs = freqs[freqs >= freqmin]
-    return freqs[sg.argmax(1)]
+plt.xlabel('Discharge (m$^3$/s)')
+plt.ylabel('Power (Pa$^2$)')
+plt.legend(['Infrasound', 'Audible'])
 
 plt.figure()
-plt.loglog(interp_times(times_infrasound, t, q), find_peak_freq(meanspec_infrasound, freqs_infrasound, 10), 'b.-')
-plt.loglog(interp_times(times_audible, t, q), find_peak_freq(meanspec_infrasound, freqs_audible, 10), 'r.-')
+plt.loglog(interp_times(times_infrasound, t, q), riversound.find_peak_freq(meanspec_infrasound, freqs_infrasound, 13), 'b.-')
+plt.loglog(interp_times(times_audible, t, q), riversound.find_peak_freq(meanspec_audible, freqs_audible, 10), 'r.-')
+plt.xlabel('Discharge (m$^3$/s)')
+plt.ylabel('Peak Frequency (Hz)')
+plt.legend(['Infrasound', 'Audible'])

@@ -65,4 +65,4 @@ def test_find_peak_freq():
     sg = np.array([[1,1,3], # time 0
                    [2,3,0], # time 1
                    [3,2,0]])# time 2
-    assert find_peak_freq(sg) == [2,1,0]
+    assert find_peak_freq(sg, freqmin = 0) == [2,1,0]
