@@ -94,12 +94,6 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
     if y is None:
         y = np.arange(Z.shape[1])
 
-    # zmin/zmax are the color axis limits. if not set by user, use the 2% and 98% percentiles
-    # this prevents outliers from dominating the dataset
-    if zmin is None:
-        zmin = np.quantile(Z[:], qmin)
-    if zmax is None:
-        zmax = np.quantile(Z[:], qmax)
 
     if log_x:
         w = x > 0
@@ -117,6 +111,17 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
     else:
         plot_y = y
         
+    # zmin/zmax are the color axis limits. if not set by user, use the 2% and 98% percentiles
+    # this prevents outliers from dominating the dataset
+    if zmin is None:
+        ZZ = Z[:]
+        wz = ~np.isinf(ZZ) & ~np.isnan(ZZ)
+        zmin = np.quantile(ZZ[wz], qmin)
+    if zmax is None:
+        ZZ = Z[:]
+        wz = ~np.isinf(ZZ) & ~np.isnan(ZZ)
+        zmax = np.quantile(Z[wz], qmax)
+
     im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
     if crosshairs:
         ax.hlines(0, x[0], x[-1], 'k', linewidth=0.5)
