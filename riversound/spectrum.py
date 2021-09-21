@@ -87,12 +87,19 @@ def round_sig(f, p): # thanks StackOverflow denizb
     f = np.array(f)
     return np.array([float(('%.' + str(p) + 'e') % ff) for ff in f])
 
-def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False, log_x = False, log_y = False):
+def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax = plt, crosshairs=False, log_x = False, log_y = False, qmin = 0.02, qmax = 0.98):
     # Z rows are x, columns are y
     if x is None:
         x = np.arange(Z.shape[0])
     if y is None:
         y = np.arange(Z.shape[1])
+
+    # zmin/zmax are the color axis limits. if not set by user, use the 2% and 98% percentiles
+    # this prevents outliers from dominating the dataset
+    if zmin is None:
+        zmin = np.quantile(Z[:], qmin)
+    if zmax is None:
+        zmax = np.quantile(Z[:], qmax)
 
     if log_x:
         w = x > 0

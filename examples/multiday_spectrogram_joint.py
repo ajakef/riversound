@@ -158,6 +158,7 @@ plt.xlabel('Discharge (m$^3$/s)')
 plt.ylabel('Power (Pa$^2$)')
 plt.legend(['Infrasound', 'Audible'])
 
+## plot discharge vs infrasound and audible peak frequencies
 plt.figure()
 plt.loglog(interp_times(times_infrasound, t, q), riversound.find_peak_freq(meanspec_infrasound, freqs_infrasound, 13), 'b.-')
 plt.loglog(interp_times(times_audible, t, q), riversound.find_peak_freq(meanspec_audible, freqs_audible, 10), 'r.-')
