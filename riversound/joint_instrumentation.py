@@ -73,7 +73,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
             st_infrasound += obspy.read(fn_infrasound[i])[0]
     st_infrasound = st_infrasound.select(id = id_infrasound)
     st_infrasound.trim(t1, t2, nearest_sample = False)
-    st_infrasound.merge()
+    st_infrasound.merge(fill_value = 'interpolate')
     st_infrasound = gemlog.deconvolve_gem_response(st_infrasound, sensor_file = infrasound_sensor_response_file, logger_file = infrasound_logger_response_file)
 
     st_audible = obspy.Stream()
