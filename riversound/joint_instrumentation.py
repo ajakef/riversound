@@ -4,7 +4,7 @@ from riversound.wav import read_audiomoth
 import matplotlib.pyplot as plt
 import gemlog
 
-def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound = '*.*.*.*', id_audible = '*.*.*.*'):
+def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound = '*.*.*.*', id_audible = '*.*.*.*', infrasound_sensor_response_file = '', infrasound_logger_response_file = ''):
     """
     For a given start and end time, read both an infrasound miniSEED file and audible .WAV file.
 
@@ -74,7 +74,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
     st_infrasound = st_infrasound.select(id = id_infrasound)
     st_infrasound.trim(t1, t2, nearest_sample = False)
     st_infrasound.merge()
-    st_infrasound = gemlog.deconvolve_gem_response(st_infrasound)
+    st_infrasound = gemlog.deconvolve_gem_response(st_infrasound, sensor_file = infrasound_sensor_response_file, logger_file = infrasound_logger_response_file)
 
     st_audible = obspy.Stream()
     for i in range(len(fn_audible)):
