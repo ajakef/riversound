@@ -281,3 +281,5 @@ def find_peak_freq(sg, freqs = None, freqmin = 2, freqmax = 10000):
         else: ## otherwise return the peak frequency
             peakfreqs.append(freqs[j])
     return peakfreqs
+
+
