@@ -64,7 +64,7 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0,
     if criterion_function == 'default':
         def criterion_function(x): return kurtosis(x) < kurtosis_threshold
     
-    freqs, times, sg = spectrogram(tr.data, fs = tr.stats.sampling_rate, window = window, nperseg = nfft, noverlap = overlap, detrend = 'linear')
+    freqs, times, sg = spectrogram(tr.data, fs = tr.stats.sampling_rate, window = window, nperseg = nfft, noverlap = overlap * nfft, detrend = 'linear')
 
     ## If a criterion function is defined, apply it to all the time windows
     ## and change results for failing windows to NaN.
