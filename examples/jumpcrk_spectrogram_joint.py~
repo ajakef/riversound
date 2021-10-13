@@ -1,0 +1,147 @@
+x;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+
+import riversound, glob, obspy, matplotlib, datetime
+import numpy as np
+import matplotlib.pyplot as plt
+import gemlog
+## run this code if you're using ipython and it doesn't show plot windows
+# %matplotlib qt 
+
+## FFT works best when data length is a power of 2, so use this function to help determine window size.
+def next_power_2(x):
+    return int(2**np.ceil(np.log2(x)))
+
+def reformat(l): # turn list l into a numpy array
+    lengths = np.array([len(i) for i in l])
+    normal_length = lengths[lengths > 0][0]
+    if any((lengths != 0) & (lengths != normal_length)):
+        raise ValueError('nonzero lengths of elements of l must all be the same')
+    for i in np.where(lengths == 0)[0]:
+        l[i] = np.zeros(normal_length)
+    return np.array(l)
+
+
+## define paths containing infrasound and audible data, read in and filter data
+
+path = '/data/jakeanderson/2021_Boise_River/short_term/2021-08-02_UpperTahquamenonFalls_Michigan/'
+path_infrasound = path + 'mseed'
+path_audible = path + 'audio'
+infr_files = sorted(glob.glob(path_infrasound + '/*mseed'))
+aud_files  = sorted(glob.glob(path_audible + '/*WAV'))
+# for individual files:
+#mseed_filename = path_infrasound + '2021-06-16T16_43_21..118..HDF.mseed'
+#aud_filename = path_audible + '20210616_181814.WAV'
+
+st_audible = obspy.Stream() # initialize stream
+for file in aud_files:
+    st_audible += riversound.read_audiomoth(file, remove_response = True)
+
+st_infrasound = obspy.read(path_infrasound + '/*mseed')
+st_infrasound = gemlog.deconvolve_gem_response(st_infrasound) # must deconvolve when not using read_infrasound_audible
+st_infrasound.filter('highpass', freq = 0.05, zerophase = True)
+
+# trim data for individual files
+t1 = obspy.UTCDateTime('2021-08-02T20:10:28')
+t2 = obspy.UTCDateTime('2021-08-02T20:11:49')
+st_infrasound.trim(t1,t2)
+st_audible.trim(t1,t2)
+
+nfft_infrasound = next_power_2(10 / st_infrasound[0].stats.delta) # >10-sec windows for freq resolution finer than 0.1 Hz
+nfft_audible = next_power_2(0.1 / st_audible[0].stats.delta) # >0.1-sec windows for freq res finer than 10 Hz
+
+print([st_infrasound, st_audible])
+
+##% Calculate the spectrum using a moderately severe kurtosis threshold
+
+times_infrasound = []
+meanspec_list_infrasound = [] 
+medspec_list_infrasound = []
+power_infrasound = []
+times_audible = []
+meanspec_list_audible = []
+medspec_list_audible = []
+power_audible = []
+
+
+for tr_infrasound,tr_audible in zip(st_infrasound,st_audible):
+    
+    infra_spec_info = riversound.spectrum(tr_infrasound, nfft = nfft_infrasound,kurtosis_threshold = 0.25, overlap = 0.9)
+    print(tr_infrasound); print(tr_audible)
+    freqs_infrasound_all = infra_spec_info['freqs']
+    medspec_list_infrasound.append(infra_spec_info['median'])
+    meanspec_list_infrasound.append(infra_spec_info['mean'])
+    power_infrasound.append(np.sum(infra_spec_info['mean']) * np.diff(infra_spec_info['freqs'])[0]) # integral spec * df
+
+    aud_spec_info = riversound.spectrum(tr_audible, nfft = nfft_audible,kurtosis_threshold = 0.25)
+    freqs_audible_all = aud_spec_info['freqs']
+    medspec_list_audible.append(aud_spec_info['median'])
+    meanspec_list_audible.append(aud_spec_info['mean'])
+    power_audible.append(np.sum(aud_spec_info['mean']) * np.diff(aud_spec_info['freqs'])[0])
+
+w = (freqs_audible_all < 20000) & (freqs_audible_all > 40)
+freqs_audible = freqs_audible_all[w]    
+meanspec_audible = reformat(meanspec_list_audible)[:,w]    
+medspec_audible = reformat(medspec_list_audible)[:,w]
+
+v = (freqs_infrasound_all < 40) & (freqs_infrasound_all > 1)
+freqs_infrasound = freqs_infrasound_all[v]    
+meanspec_infrasound = reformat(meanspec_list_infrasound)[:,v]
+medspec_infrasound = reformat(medspec_list_infrasound)[:,v]
+
+## plot spectrogram; white bars are time intervals rejected by kurtosis criterion
+plt.figure(1)
+plt.subplot(2,1,1)
+riversound.image(np.log10(aud_spec_info['specgram'].T), aud_spec_info['times'], aud_spec_info['freqs'],log_y= True)
+plt.xlabel('Time (sec) after %s' % tr_audible.stats.starttime.strftime(format = '%Y-%m-%d %H:%M'))
+plt.ylabel('Frequency (Hz)')
+plt.title('Infrasound & Audible-sound Spectrogram')
+
+plt.subplot(2,1,2)
+riversound.image(np.log10(infra_spec_info['specgram'].T), infra_spec_info['times'], infra_spec_info['freqs'])
+plt.xlabel('Time (sec) after %s' % tr_infrasound.stats.starttime.strftime(format = '%Y-%m-%d %H:%M'))
+plt.ylabel('Frequency (Hz)')
+
+# plot spectra
+plt.figure(2)
+num_colors = len(plt.rcParams['axes.prop_cycle'].by_key()['color'])
+for i in range(len(st_audible)):
+    col = plt.rcParams['axes.prop_cycle'].by_key()['color'][i%num_colors]
+    plt.loglog(freqs_infrasound, medspec_infrasound[i,:], color = col, label = st_infrasound[i].stats.station)
+    plt.loglog(freqs_audible, medspec_audible[i,:], color = col)
+    plt.legend() # uses labels from plt.loglog
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Power Spectral Density (pascals$^2$/Hz)')
+med_noise = gemlog.ims_noise('med')
+high_noise = gemlog.ims_noise('high')
+plt.loglog(med_noise['freqs'],med_noise['spectrum'],label = 'medium noise model')
+plt.loglog(high_noise['freqs'],high_noise['spectrum'],label = 'high noise model')
+plt.legend()
+
+
+
+
+
+    
+# plot spectrum vs. noise models for individual trace plots:
+plt.figure(2)
+plt.loglog(freqs_infrasound, medspec_infrasound[0,:], label = tr_infrasound.stats.starttime.strftime(format = '%Y-%m-%d %H:%M'))
+plt.loglog(freqs_audible, medspec_audible[0,:], label = tr_audible.stats.starttime.strftime(format = '%Y-%m-%d %H:%M'))
+med_noise = gemlog.ims_noise('med')
+high_noise = gemlog.ims_noise('high')
+plt.loglog(med_noise['freqs'],med_noise['spectrum'],label = 'medium noise model')
+plt.loglog(high_noise['freqs'],high_noise['spectrum'],label = 'high noise model')
+plt.legend()
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Power Spectral Density (Pascals$^2$/Hz)')
+
+
+
+
+    # riversound.spectrum() trim data to quiet periods using trim method
+    # plot power spectrum of quiet periods (mean spectrum output of riversound.spectrum output)
+    
+#nfft_infrasound = next_power_2(10 / tr_infrasound.stats.delta) # >10-sec windows for freq resolution finer than 0.1 Hz
+#nfft_audible = next_power_2(0.1 / tr_audible.stats.delta) # >0.1-sec windows for freq res finer than 10 Hz
+#riversound.spectrum()
