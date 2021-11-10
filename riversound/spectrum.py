@@ -122,7 +122,7 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
         wz = ~np.isinf(ZZ) & ~np.isnan(ZZ)
         zmax = np.quantile(Z[wz], qmax)
 
-    im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
+    im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'auto')#, cmap='YlOrRd')
     if crosshairs:
         ax.hlines(0, x[0], x[-1], 'k', linewidth=0.5)
         ax.vlines(0, y[0], y[-1], 'k', linewidth=0.5)

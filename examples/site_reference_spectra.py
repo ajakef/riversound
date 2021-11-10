@@ -17,7 +17,7 @@ trailcreek_low.to_csv(os.path.join(output_data_path, output_file), index = False
 
 ###########################
 output_file = 'trail_creek_high_2021-05-16.txt' ### Trail Creek high flow (May)
-infrasound_file = '/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-05-17/mseed/2021-05-16T00_00_00..101..HDF.mseed'
+infrasound_file = '/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-05-17/mseed/2021-05-16T09_00_00..101..HDF.mseed'
 audible_file = '/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-05-17/AM006/20210516_090000.WAV'
 t1 = obspy.UTCDateTime('2021-05-16T09:00:00')
 t2 = obspy.UTCDateTime('2021-05-16T11:00:00')
@@ -38,8 +38,8 @@ tahquamenon.to_csv(os.path.join(output_data_path, output_file), index = False)
 ##############################
 output_file = 'WWP_P2_1_2021-06-14.txt' ### Phase 2 of WWP, first wave (double black diamond)
 infrasound_file = '/data/jakeanderson/2021_Boise_River/short_term/2021-06-14_wwp_wave2/mseed/*160*'
-audible_file =  '/data/jakeanderson/2021_Boise_River/short_term/2021-06-14_wwp_wave2/Audiomoth/000/19700101_030441.WAV'
-t1 = obspy.UTCDateTime('2021-01-02T20:10:28')
+audible_file =  '/data/jakeanderson/2021_Boise_River/short_term/2021-06-14_wwp_wave2/Audiomoth/000/19700101_030441.WAV' # wonky date from lost real time clock
+t1 = obspy.UTCDateTime('1900-01-02T20:10:28') # accommodate wonky date
 t2 = obspy.UTCDateTime('2021-12-02T20:11:49')
 
 wwp_p2_1 = riversound.site_reference_spectrum(infrasound_file, audible_file, t1, t2)
@@ -84,6 +84,26 @@ t2 = obspy.UTCDateTime('2021-05-24T10:00:00')
 
 wwp = riversound.site_reference_spectrum(infrasound_file, audible_file, t1, t2)
 wwp.to_csv(os.path.join(output_data_path, output_file), index = False)
+
+#############################
+output_file = 'Con1E_2021-04-18.txt' ### 
+infrasound_file = '/data/jakeanderson/2021_Boise_River/long_term/CON1E_DCEW/mseed_all/2021-04-18T00_00_00..128..HDF.mseed'
+audible_file =  '/data/jakeanderson/2021_Boise_River/long_term/CON1E_DCEW/audio_all/20210418_090000.WAV'
+t1 = obspy.UTCDateTime('2021-04-18T09:00:00')
+t2 = obspy.UTCDateTime('2021-04-18T10:00:00')
+
+con1e = riversound.site_reference_spectrum(infrasound_file, audible_file, t1, t2)
+con1e.to_csv(os.path.join(output_data_path, output_file), index = False)
+
+#############################
+output_file = 'MRBD_2021-09-13.txt' ### 
+infrasound_file = '/data/jakeanderson/2021_Boise_River/long_term/MRBD_Michigan/mseed_all/2021-09-12T00_00_00..191..HDF.mseed'
+audible_file =  '/data/jakeanderson/2021_Boise_River/long_term/MRBD_Michigan/audio_all/20210912_030000.WAV'
+t1 = obspy.UTCDateTime('2021-09-12T02:48:00')
+t2 = obspy.UTCDateTime('2021-09-12T03:07:00')
+
+MRBD = riversound.site_reference_spectrum(infrasound_file, audible_file, t1, t2)
+MRBD.to_csv(os.path.join(output_data_path, output_file), index = False)
 
 plt.loglog(trailcreek_high['freqs'], trailcreek_high['spectrum'])
 plt.loglog(trailcreek_low['freqs'], trailcreek_low['spectrum'])
