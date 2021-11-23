@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15):
+    ## function to create reference spectra for a site
     nfft_audible = 2**15
     nfft_infrasound = 2**13
     tr_audible = riversound.read_audiomoth(audible_file, remove_response = True)
