@@ -1,4 +1,6 @@
-
+x;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
 
 import riversound, glob, obspy, matplotlib, datetime
 import numpy as np
@@ -83,7 +85,7 @@ freqs_audible = freqs_audible_all[w]
 meanspec_audible = reformat(meanspec_list_audible)[:,w]    
 medspec_audible = reformat(medspec_list_audible)[:,w]
 
-v = (freqs_infrasound_all < 40) & (freqs_infrasound_all > 0)
+v = (freqs_infrasound_all < 40) & (freqs_infrasound_all > 1)
 freqs_infrasound = freqs_infrasound_all[v]    
 meanspec_infrasound = reformat(meanspec_list_infrasound)[:,v]
 medspec_infrasound = reformat(medspec_list_infrasound)[:,v]
