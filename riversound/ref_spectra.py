@@ -19,15 +19,17 @@ def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasou
     w = (freqs_audible < 20000) & (freqs_audible > 40)
     freqs_audible = freqs_audible[w]    
     medspec_audible = aud_spec_info['median'][w]
-    q1_audible = np.quantile(aud_spec_info['specgram'], 0.25, 1)
-    q3_audible = np.quantile(aud_spec_info['specgram'], 0.75, 1)
+    nn = ~np.isnan(aud_spec_info['specgram'][0,:])
+    q1_audible = np.quantile(aud_spec_info['specgram'][:,nn], 0.25, 1)[w]
+    q3_audible = np.quantile(aud_spec_info['specgram'][:,nn], 0.75, 1)[w]
     
     freqs_infrasound = infra_spec_info['freqs']
     w = (freqs_infrasound < 40) & (freqs_infrasound > 0)
     freqs_infrasound = freqs_infrasound[w]    
     medspec_infrasound = infra_spec_info['median'][w]
-    q1_infrasound = np.quantile(infra_spec_info['specgram'], 0.25, 1)
-    q3_infrasound = np.quantile(infra_spec_info['specgram'], 0.75, 1)
+    nn = ~np.isnan(infra_spec_info['specgram'][0,:])
+    q1_infrasound = np.quantile(infra_spec_info['specgram'][:,nn], 0.25, 1)[w]
+    q3_infrasound = np.quantile(infra_spec_info['specgram'][:,nn], 0.75, 1)[w]
 
     freqs = np.concatenate([freqs_infrasound, freqs_audible])
     medspec = np.concatenate([medspec_infrasound, medspec_audible])
