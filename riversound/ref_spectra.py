@@ -19,16 +19,21 @@ def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasou
     w = (freqs_audible < 20000) & (freqs_audible > 40)
     freqs_audible = freqs_audible[w]    
     medspec_audible = aud_spec_info['median'][w]
-
+    q1_audible = np.quantile(aud_spec_info['specgram'], 0.25, 0)
+    q3_audible = np.quantile(aud_spec_info['specgram'], 0.75, 0)
+    
     freqs_infrasound = infra_spec_info['freqs']
     w = (freqs_infrasound < 40) & (freqs_infrasound > 0)
     freqs_infrasound = freqs_infrasound[w]    
     medspec_infrasound = infra_spec_info['median'][w]
+    q1_infrasound = np.quantile(infra_spec_info['specgram'], 0.25, 0)
+    q3_infrasound = np.quantile(infra_spec_info['specgram'], 0.75, 0)
 
     freqs = np.concatenate([freqs_infrasound, freqs_audible])
     medspec = np.concatenate([medspec_infrasound, medspec_audible])
-
-    return pd.DataFrame.from_dict({'freqs':freqs, 'spectrum':medspec})
+    q1 = np.concatenate([q1_infrasound, q1_audible])
+    q3 = np.concatenate([q3_infrasound, q3_audible])
+    return pd.DataFrame.from_dict({'freqs':freqs, 'spectrum':medspec, 'q1':q1, 'q3':q3})
 
 
 def plot_noise_specs(ax = plt):
