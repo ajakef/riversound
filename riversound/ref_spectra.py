@@ -33,6 +33,7 @@ def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasou
     medspec = np.concatenate([medspec_infrasound, medspec_audible])
     q1 = np.concatenate([q1_infrasound, q1_audible])
     q3 = np.concatenate([q3_infrasound, q3_audible])
+    breakpoint()
     return pd.DataFrame.from_dict({'freqs':freqs, 'spectrum':medspec, 'q1':q1, 'q3':q3})
 
 
