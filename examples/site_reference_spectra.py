@@ -119,14 +119,19 @@ if write_data:
 
 plt.loglog(trailcreek_high['freqs'], trailcreek_high['spectrum'], label = 'TC_high')
 plt.loglog(trailcreek_low['freqs'], trailcreek_low['spectrum'], label = 'TC_low')
-plt.loglog(tahquamenon['freqs'], tahquamenon['spectrum'], label = 'TQ')
+#plt.loglog(tahquamenon['freqs'], tahquamenon['spectrum'], label = 'TQ')
 plt.loglog(wwp_p2_1['freqs'], wwp_p2_1['spectrum'], label = 'WWP_P2_1')
 plt.loglog(annmorrison['freqs'], annmorrison['spectrum'], label = 'AM')
 plt.loglog(eckert['freqs'], eckert['spectrum'], label = 'Eckert')
 plt.loglog(diversiondam['freqs'], diversiondam['spectrum'], label = 'DD')
 plt.loglog(wwp['freqs'], wwp['spectrum'], label = 'WWP')
 plt.loglog(con1e['freqs'], con1e['spectrum'], label = 'C1E')
-plt.loglog(MRBD['freqs'], MRBD['spectrum'], label = 'MRBD')
+#plt.loglog(MRBD['freqs'], MRBD['spectrum'], label = 'MRBD')
 plt.legend()
 plot_noise_specs()
 
+
+
+
+plt.loglog(trailcreek_low['freqs'], trailcreek_low['q1'], label = 'TC_low')
+plt.loglog(trailcreek_low['freqs'], trailcreek_low['q3'], label = 'TC_low')
