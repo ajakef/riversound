@@ -73,7 +73,7 @@ response_audiomoth_20211119 = obspy.core.inventory.response.Response()
 response_audiomoth_20211119 = response_audiomoth_20211119.from_paz(
     zeros,
     poles,
-    stage_gain = 0.7 / (bitweight_V/(sens_mic * gain_preamp)),
+    stage_gain = 1 / (bitweight_V/(sens_mic * gain_preamp)),
     stage_gain_frequency=300.0,
     input_units='M/S',
     output_units='VOLTS',
