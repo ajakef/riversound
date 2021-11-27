@@ -2,8 +2,11 @@ import riversound, glob, obspy, matplotlib, datetime, os, gemlog
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import scipy.signal
 
-def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15):
+def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
+    window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
+    window_audible = _process_window_inputs(window, window_audible, nfft_audible)
     ## function to create reference spectra for a site
     nfft_audible = 2**15
     nfft_infrasound = 2**13
@@ -12,8 +15,8 @@ def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasou
     tr_infrasound = gemlog.deconvolve_gem_response(tr_infrasound) # must deconvolve when not using read_infrasound_audible
     tr_infrasound.trim(t1,t2)
     tr_audible.trim(t1,t2)
-    infra_spec_info = riversound.spectrum(tr_infrasound, nfft = nfft_infrasound,kurtosis_threshold = 0.25, overlap = 0.9)
-    aud_spec_info = riversound.spectrum(tr_audible, nfft = nfft_audible,kurtosis_threshold = 0.25, overlap = 0.9)
+    infra_spec_info = riversound.spectrum(tr_infrasound, nfft = nfft_infrasound,kurtosis_threshold = 0.25, overlap = 0.9, window = window_infrasound)
+    aud_spec_info = riversound.spectrum(tr_audible, nfft = nfft_audible,kurtosis_threshold = 0.25, overlap = 0.9, window = window_audible)
 
     freqs_audible = aud_spec_info['freqs']
     w = (freqs_audible < 20000) & (freqs_audible > 40)
@@ -51,3 +54,11 @@ def plot_noise_specs(ax = plt):
     ax.loglog(noise_spec_high['freqs'][w_ims], noise_spec_high['spectrum'][w_ims], 'lightgray')
     ax.loglog(noise_spec_gem['freqs'][w_gem], noise_spec_gem['spectrum'][w_gem], 'lightgray')
 
+
+def _process_window_inputs(window_gen, window, nfft):
+    if window is None:
+        window = window_gen
+    if window == 'mcnamara':
+        window = scipy.signal.windows.tukey(nfft, 0.2) # 10% taper on each side from McNamara and Buland 2004
+    return window
+        

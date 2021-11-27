@@ -125,13 +125,64 @@ plt.loglog(annmorrison['freqs'], annmorrison['spectrum'], label = 'AM')
 plt.loglog(eckert['freqs'], eckert['spectrum'], label = 'Eckert')
 plt.loglog(diversiondam['freqs'], diversiondam['spectrum'], label = 'DD')
 plt.loglog(wwp['freqs'], wwp['spectrum'], label = 'WWP')
-plt.loglog(con1e['freqs'], con1e['spectrum'], label = 'C1E')
+#plt.loglog(con1e['freqs'], con1e['spectrum'], label = 'C1E')
 #plt.loglog(MRBD['freqs'], MRBD['spectrum'], label = 'MRBD')
 plt.legend()
-plot_noise_specs()
+riversound.plot_noise_specs()
+
+
+plt.loglog(annmorrison['freqs'], annmorrison['q1'])
+plt.loglog(annmorrison['freqs'], annmorrison['q3'])
 
 
 
 
 plt.loglog(trailcreek_low['freqs'], trailcreek_low['q1'], label = 'TC_low')
 plt.loglog(trailcreek_low['freqs'], trailcreek_low['q3'], label = 'TC_low')
+
+## jump up above 40 Hz: DD, TC_high, TC_low
+## jump down above 20 Hz: AM, Eckert
+## No effect: MRBD
+
+## truncating the infrasound data to just a couple minutes in order to more closely approximate the audible recording period doesn't fix it.
+##################################
+
+import riversound, glob, obspy, matplotlib, datetime, os, gemlog
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+write_data = False
+
+output_data_path = os.path.realpath(os.path.join(riversound.__path__[0
+], '../data/reference_spectra'))
+
+############################
+## significant scatter in band-limited power estimates. Spectrum of power estimates appears to be mostly white; weak long-term trends. Correlation between power estimates over different freq bands is negligible at short window lengths (5 sec) and significant at much longer window lengths.
+
+output_file = 'trail_creek_low_2021-10-10.txt' ### Trail Creek low flow (October)
+infrasound_file = '/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-10-10/mseed/2021-10-10T00_00_00..191..HDF.mseed'
+audible_file = '/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-10-10/AM005/20211010_090000.WAV'
+t1 = obspy.UTCDateTime('2021-10-10T09:00:00')
+t2 = obspy.UTCDateTime('2021-10-10T11:00:00')
+
+tr_infrasound = obspy.read('/data/jakeanderson/2021_Boise_River/long_term/TrailCreek/2021-10-10/mseed/2021-10-10T00_00_00..191..HDF.mseed')[0]
+
+#def f(x): print(kurtosis(x)); return kurtosis(x) < 0.05
+#s_inf = riversound.spectrum(tr_infrasound, criterion_function = f)
+s_inf = riversound.spectrum(tr_infrasound, kurtosis_threshold = 0.5, nfft = 2**13)
+M = s_inf['specgram']
+f = s_inf['freqs']
+df = np.diff(f)[0]
+p22 = M[(f>22) & (f < 25),:].sum(0) * df
+p15 = M[(f>15) & (f < 18),:].sum(0) * df
+p35 = M[(f>35) & (f < 38),:].sum(0) * df
+w = (~np.isnan(p15)) & (p22 > 1.4) & (p22 < 2.1) & (p15 > 1.9) & (p15 < 2.7)
+print([np.quantile(p22[w], 0.75)/np.quantile(p22[w], 0.25), np.quantile(p15[w], 0.75)/np.quantile(p15[w], 0.25), np.quantile(p35[w], 0.75)/np.quantile(p35[w], 0.25)])
+print(np.corrcoef(p15[w], p22[w]))
+print(np.corrcoef(p15[w], p35[w]))
+
+
+plt.loglog(p15, p35)
+np.corrcoef(p15, p22)
+plt.loglog(p15[w], p22[w], 'g,')
