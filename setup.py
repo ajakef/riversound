@@ -40,6 +40,7 @@ URL = 'https://github.com/ajakef/riversound'
 VERSION = '0.0.2'
 
 INSTALL_REQUIRES = [
+    'acoustics',
     'obspy',
     'numpy>=1.15.0',
     'pandas>=1.0.0',

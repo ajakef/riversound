@@ -1,6 +1,6 @@
 import numpy as np
 import pytest, shutil, os, obspy
-from riversound.spectrum import * # this will have to change once we properly package the repo
+from riversound.attenuation import * # this will have to change once we properly package the repo
 
 def approx(x, y, p = 0.01):
     return np.abs((x - y)/x) < p
