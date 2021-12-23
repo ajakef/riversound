@@ -3,6 +3,7 @@ from riversound.spectrum import spectrum, image, apply_function_windows, pgram, 
 from riversound.joint_instrumentation import read_infrasound_audible
 from riversound.discharge import read_discharge, read_DCEW
 from riversound.ref_spectra import site_reference_spectrum, plot_noise_specs
+from riversound.attenuation import attenuation_power_spectrum
 #from gemlog.gemlog import Convert, ReadGem, convert, read_gem, get_gem_specs
 #from gemlog.gem_network import summarize_gps, read_gps, SummarizeAllGPS, make_gem_inventory, rename_files, merge_files_day
 #from gemlog.gemlog_aux import make_db, calc_channel_stats

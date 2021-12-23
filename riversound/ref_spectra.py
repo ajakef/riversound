@@ -58,7 +58,7 @@ def plot_noise_specs(ax = plt):
 def _process_window_inputs(window_gen, window, nfft):
     if window is None:
         window = window_gen
-    if window == 'mcnamara':
+    if (type(window) is str) and (window.lower()  == 'mcnamara'):
         window = scipy.signal.windows.tukey(nfft, 0.2) # 10% taper on each side from McNamara and Buland 2004
     return window
         
