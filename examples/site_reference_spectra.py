@@ -2,6 +2,7 @@ import riversound, glob, obspy, matplotlib, datetime, os, gemlog
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.signal import filtfilt
 
 write_data = True
 
