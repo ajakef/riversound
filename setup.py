@@ -79,7 +79,7 @@ CLASSIFIERS = [
 
 ENTRY_POINTS = {
     'console_scripts': [
-#        'gem2ms = gemlog.gem2ms:main',
+        'convert_wav = riversound.convert_wav:main',
 #        'gemconvert = gemlog.gem2ms:main',
 #        'gem_cat = gemlog.gem_cat:main'
     ]
