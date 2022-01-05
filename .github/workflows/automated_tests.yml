@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.9.7] # 3.9.9 is incompatible with obspy 1.2.2
 
     steps:
     - uses: actions/checkout@v2
