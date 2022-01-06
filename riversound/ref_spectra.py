@@ -4,6 +4,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.signal
 
+def read_ref_spec(filename):
+    """
+    Read a reference spectrum
+    
+    Parameters:
+    -----------
+    filename: path and name of reference spectrum file
+    
+    Returns:
+    --------
+    tuple of frequencies (Hz) and power spectral densities (Pa^2/Hz) of spectrum
+
+    Example (run from riversound root directory):
+    freqs, spectrum = read_ref_spec('data/reference_spectra/MRBD_2021-09-13.txt')
+    """
+    s = pd.read_csv(filename)
+    return (np.array(s.freqs), np.array(s.spectrum))
+
+
 def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
     window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
     window_audible = _process_window_inputs(window, window_audible, nfft_audible)

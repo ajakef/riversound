@@ -34,24 +34,6 @@ def calc_degree_2pt(x, y, xmin = 0.5, xmax = np.inf):
     return d
   
 
-def read_ref_spec(filename):
-    """
-    Read a reference spectrum
-    
-    Parameters:
-    -----------
-    filename: path and name of reference spectrum file
-    
-    Returns:
-    --------
-    tuple of frequencies (Hz) and power spectral densities (Pa^2/Hz) of spectrum
-
-    Example (run from riversound root directory):
-    freqs, spectrum = read_ref_spec('data/reference_spectra/MRBD_2021-09-13.txt')
-    """
-    s = pd.read_csv(filename)
-    return (np.array(s.freqs), np.array(s.spectrum))
-
 def band_bin(freqs, spectrum, bands_per_octave = 3):
     """
     Integrate a power spectrum over logarithmic frequency bins
