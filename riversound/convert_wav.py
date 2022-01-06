@@ -10,9 +10,9 @@ except Exception as e:
     sys.exit(2)
 
 def print_call():
-    print('convert_wav -i <input_file> -s <speedup> -o <output_file> -l <low_cutoff_freq>')
+    print('convert_wav -i <input_file> -s <speedup> -o <output_file> -l <low_cutoff_freq> -t <trace_number>')
     print('-i --input_file: required')
-    print('-s --speedup: factor to speed up data in recording (default 100)')
+    print('-s --speedup: factor to speed up data in recording (default 128: 7 octaves)')
     print('-o --output_file: default input_file.wav. If dir, writes to output_file/input_file.wav')
     print('-t --trace_number: if input file has multiple traces, which to convert (default 0)')
     print('-l --low_cutoff_freq: default 1 (Hz)')
@@ -29,7 +29,7 @@ def main(argv = None):
     output_file = None
     trace_number = 0
     test = False
-    speedup = 100
+    speedup = 128
     low_cutoff_freq = 1
     try:
         opts, args = getopt.getopt(argv,"hi:s:o:l:",[])

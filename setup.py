@@ -41,6 +41,7 @@ VERSION = '0.0.2'
 
 INSTALL_REQUIRES = [
     'acoustics',
+    'simpleaudio',
     'obspy',
     'numpy==1.21.0', # 1.22.0 breaks obspy 1.2.2. When new obspy is released, make both >=
     'pandas>=1.0.0',
@@ -80,6 +81,7 @@ CLASSIFIERS = [
 ENTRY_POINTS = {
     'console_scripts': [
         'convert_wav = riversound.convert_wav:main',
+        'play_data = riversound.play_data:main',
 #        'gemconvert = gemlog.gem2ms:main',
 #        'gem_cat = gemlog.gem_cat:main'
     ]
