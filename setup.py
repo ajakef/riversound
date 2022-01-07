@@ -37,7 +37,7 @@ URL = 'https://github.com/ajakef/riversound'
 #with open(version_path) as version_file:
 #    exec(version_file.read(), version_dict)
 #VERSION = version_dict['__version__']
-VERSION = '0.0.2'
+VERSION = '0.1.0'
 
 INSTALL_REQUIRES = [
     'acoustics',
