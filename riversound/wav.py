@@ -37,11 +37,13 @@ def read_audiomoth(filename, network = '', station = '', location = '', channel 
     if remove_response:
         # following VERY ROUGH sensitivity estimate taken from assumptions below
     ## need to replace this with a real response
-        adc_bitweight = 1.25/2**12
-        gain = 10**(30.6/20)
-        mic_sensitivity = 10**(-38/20)
-        pa_per_count = adc_bitweight / (gain * mic_sensitivity) * 0.03
-        tr.data = tr.data * pa_per_count
+        #adc_bitweight = 1.25/2**12
+        #gain = 10**(30.6/20)
+        #mic_sensitivity = 10**(-38/20)
+        #pa_per_count = adc_bitweight / (gain * mic_sensitivity) * 0.03
+        #tr.data = tr.data * pa_per_count
+        tr.stats.response = response_audiomoth_20211119
+        tr.remove_response()
 
     return tr
 
@@ -56,3 +58,24 @@ def read_audiomoth(filename, network = '', station = '', location = '', channel 
 
 #tr.trim(tr.stats.starttime, tr.stats.starttime + 1)
 #tr.spectrogram(log = True, dbscale = True)
+
+## response from 2021-11-19 calibration
+## correct claimed audiomoth sensitivity: https://www.openacousticdevices.info/support/device-support/calibration-for-sound-pressure-level-measurement
+sens_mic = 10**(-18/20) # -18 dBV/Pa, which includes a built-in gain of 20 dB (https://media.digikey.com/pdf/Data%20Sheets/Knowles%20Acoustics%20PDFs/SPM0408LE5H-TB.pdf)
+gain_preamp = 15 # med gain
+bitweight_V = 3.3/(2**16-1) # Volts per count
+      
+poles = [48*6.28, 100*6.28]
+zeros = [0,0]
+
+## gain adjustment of 0.7 determined by trial and error in this calibration
+response_audiomoth_20211119 = obspy.core.inventory.response.Response()
+response_audiomoth_20211119 = response_audiomoth_20211119.from_paz(
+    zeros,
+    poles,
+    stage_gain = 1 / (bitweight_V/(sens_mic * gain_preamp)),
+    stage_gain_frequency=300.0,
+    input_units='M/S',
+    output_units='VOLTS',
+    normalization_frequency=300.0
+    )

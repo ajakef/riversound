@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: [3.9.7] # 3.9.9 is incompatible with obspy 1.2.2
 
     steps:
     - uses: actions/checkout@v2
@@ -23,6 +23,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        sudo apt-get install -y libasound2-dev # skip this because sound playing appears not to be testable on github
         python -m pip install --upgrade pip
         pip install gemlog numpy scipy matplotlib pandas obspy
         pip install .
@@ -34,7 +35,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       run: |
-        pytest tests
+        pytest -k 'not play' tests # skip tests for play functions; don't work on github
 
   linting:
 

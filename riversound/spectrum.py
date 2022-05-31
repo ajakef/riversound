@@ -64,7 +64,7 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0,
     if criterion_function == 'default':
         def criterion_function(x): return kurtosis(x) < kurtosis_threshold
     
-    freqs, times, sg = spectrogram(tr.data, fs = tr.stats.sampling_rate, window = window, nperseg = nfft, noverlap = overlap, detrend = 'linear')
+    freqs, times, sg = spectrogram(tr.data, fs = tr.stats.sampling_rate, window = window, nperseg = nfft, noverlap = overlap * nfft, detrend = 'linear')
 
     ## If a criterion function is defined, apply it to all the time windows
     ## and change results for failing windows to NaN.
@@ -122,7 +122,7 @@ def image(Z, x = None, y = None, aspect = 'equal', zmin = None, zmax = None, ax 
         wz = ~np.isinf(ZZ) & ~np.isnan(ZZ)
         zmax = np.quantile(Z[wz], qmax)
 
-    im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'nearest')#, cmap='YlOrRd')
+    im = ax.pcolormesh(plot_x, plot_y, Z.T, vmin = zmin, vmax = zmax, shading = 'auto')#, cmap='YlOrRd')
     if crosshairs:
         ax.hlines(0, x[0], x[-1], 'k', linewidth=0.5)
         ax.vlines(0, y[0], y[-1], 'k', linewidth=0.5)

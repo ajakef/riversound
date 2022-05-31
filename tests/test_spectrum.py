@@ -1,6 +1,9 @@
 import numpy as np
 import pytest, shutil, os, obspy
-from riversound.spectrum import * # this will have to change once we properly package the repo
+from riversound.spectrum import * 
+
+def approx(x, y, p = 0.01):
+    return np.abs((x - y)/x) < p
 
 ## set up the temporary folder for running the tests
 def setup_module():
@@ -30,7 +33,9 @@ def test_spectrum_parseval():
     
     ## calculate spectrum using an infinite kurtosis threshold (never exclude
     ## a window as suspected noise) and a rectangular window to keep it simple.
-    spectrum_info = spectrum(tr, kurtosis_threshold=1e16, nfft = 4096, window = 'boxcar')
+    nfft = 4096
+    overlap = 0.75
+    spectrum_info = spectrum(tr, kurtosis_threshold=1e16, nfft = nfft, overlap = overlap, window = 'boxcar')
 
     ## calculate power in both the time and frequency domain, and ensure that they are equal
     psd = spectrum_info['mean']
@@ -40,7 +45,12 @@ def test_spectrum_parseval():
     #print(freq_domain_power/ time_domain_power-1)
     assert np.abs(freq_domain_power/time_domain_power - 1) < 1e-3 # typically under 1e-4
 
-    
+    ## ensure that the spectrogram dimensions and freqs are approximately correct
+    assert len(spectrum_info['freqs']) == spectrum_info['specgram'].shape[0]
+    assert approx(len(spectrum_info['freqs']), nfft/2)
+    assert approx(spectrum_info['freqs'][1], 1/(nfft*tr.stats.delta))
+    assert approx(spectrum_info['freqs'][-1], 0.5/(tr.stats.delta))
+    assert approx(spectrum_info['specgram'].shape[1], len(tr.data)/nfft/(1-overlap))
 ## check that the pgram function obeys Parseval's relation for power:
 ## integral of the spectrum = mean of squared time-domain signal
 ## pgram ("periodogram") is the simple single Fourier transform. spectrum is the advanced one for

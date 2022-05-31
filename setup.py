@@ -37,11 +37,13 @@ URL = 'https://github.com/ajakef/riversound'
 #with open(version_path) as version_file:
 #    exec(version_file.read(), version_dict)
 #VERSION = version_dict['__version__']
-VERSION = '0.0.2'
+VERSION = '0.1.0'
 
 INSTALL_REQUIRES = [
+    'acoustics',
+    'simpleaudio',
     'obspy',
-    'numpy>=1.15.0',
+    'numpy==1.21.0', # 1.22.0 breaks obspy 1.2.2. When new obspy is released, make both >=
     'pandas>=1.0.0',
     'scipy>=1.0.0',
     'matplotlib>=3.2.0',
@@ -78,7 +80,8 @@ CLASSIFIERS = [
 
 ENTRY_POINTS = {
     'console_scripts': [
-#        'gem2ms = gemlog.gem2ms:main',
+        'convert_wav = riversound.convert_wav:main',
+        'play_data = riversound.play_data:main',
 #        'gemconvert = gemlog.gem2ms:main',
 #        'gem_cat = gemlog.gem_cat:main'
     ]
