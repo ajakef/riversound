@@ -1,10 +1,19 @@
+# for linux, need to install simpleaudio's dependency with sudo apt-get install -y python3-dev libasound2-dev
 import sys # should always be available, doesn't need to be in "try"
 try:
     import numpy as np
     import os, glob, getopt, logging, traceback, platform
-    import riversound, obspy, simpleaudio
+    import riversound, obspy
 except Exception as e:
     print('Either dependencies are missing, or the environment is not active')
+    print('Error message:')
+    print(e)
+    sys.exit(2)
+
+try:
+    import simpleaudio
+except Exception as e:
+    print('Dependency package "simpleaudio" cannot be imported')
     print('Error message:')
     print(e)
     sys.exit(2)

@@ -37,11 +37,11 @@ URL = 'https://github.com/ajakef/riversound'
 #with open(version_path) as version_file:
 #    exec(version_file.read(), version_dict)
 #VERSION = version_dict['__version__']
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 INSTALL_REQUIRES = [
+#    'simpleaudio', # hard to install on windows? non-essential
     'acoustics',
-    'simpleaudio',
     'obspy',
     'numpy==1.21.0', # 1.22.0 breaks obspy 1.2.2. When new obspy is released, make both >=
     'pandas>=1.0.0',
