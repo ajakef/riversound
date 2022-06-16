@@ -26,7 +26,7 @@ jobs:
         sudo apt-get install -y libasound2-dev # skip this because sound playing appears not to be testable on github
         python -m pip install --upgrade pip
         pip install gemlog numpy scipy matplotlib pandas obspy
-	pip install simpleaudio # optional dependency, only used in play_data
+        pip install simpleaudio # optional dependency, only used in play_data
         pip install .
         # pytest prefers to import from local dir instead of system PATH, so
         # make local dir installable.  Would be better to get it to import from
