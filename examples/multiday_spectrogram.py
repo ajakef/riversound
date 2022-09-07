@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 #%matplotlib qt # probably not needed
 
 #path_pattern = '/data/jakeanderson/2021_Boise_River/long_term/WhitewaterPark/mseed/2021-05-[123]*149*' # change to the files you want to read
-path_pattern = '/home/jake/Work/StreamAcoustics/Sawtooths/TrailCreek/2021-05-17/AM006/*_090000.WAV' # change to the files you want to read
+#path_pattern = '/home/jake/Work/StreamAcoustics/Sawtooths/TrailCreek/2021-05-17/AM006/*_090000.WAV' # change to the files you want to read
+path_pattern = '/home/jake/2022-08-31_Goodwin/audiomoth/202206[01]?_16*WAV'
 fn = sorted(glob.glob(path_pattern))
 
 if len(fn) == 0:
@@ -45,11 +46,16 @@ for i, file in enumerate(fn):
     medspec[i,:] = spec_info['median']
     meanspec[i,:] =  spec_info['mean']
     power[i] = np.sum(spec_info['mean']) * np.diff(freqs)[0] # integral spec * df
-    
+
+w = freqs > 50
+freqs = freqs[w]
+medspec = medspec[:,w]
+meanspec = meanspec[:,w]
+
 ## plot the spectrogram and power
 plt.figure()
 plt.subplot(2,1,1)
-riversound.image(np.log10(meanspec + 0.001 * np.quantile(meanspec, 0.95)), plot_times, freqs, crosshairs = False)
+riversound.image(np.log10(meanspec + 0.001 * np.quantile(meanspec, 0.95)), plot_times, freqs, crosshairs = False, log_y = True)
 plt.ylim([100, 10000])
 plt.ylabel('Frequency (Hz)')
 plt.subplot(2,1,2)

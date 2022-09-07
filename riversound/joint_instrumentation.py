@@ -79,6 +79,7 @@ def read_infrasound_audible(t1, t2, path_infrasound, path_audible, id_infrasound
     st_audible = obspy.Stream()
     for i in range(len(fn_audible)):
         if (file_start_audible[i] < t2) and (file_end_guess_audible[i] > t1):
+            print('Reading file %s' % fn_audible[i])
             st_audible += read_audiomoth(fn_audible[i], remove_response = True)
     st_audible = st_audible.select(id = id_audible)
     st_audible.trim(t1, t2, nearest_sample = False)

@@ -27,12 +27,13 @@ def reformat(l): # turn list l into a numpy array
     
 ## define paths containing infrasound and audible data
 #path = '/data/jakeanderson/2021_Boise_River/long_term/DivDam/2021-05-25_DiversionDam/'
-path = '/data/jakeanderson/2021_Boise_River/long_term/Eckert/'
-path_infrasound = path + 'mseed_119_all'
-path_audible = path + 'AM004_all'
+#path = '/data/jakeanderson/2021_Boise_River/long_term/Eckert/'
+path = '/home/jake/2022-06-20_Ridenbaugh/'
+path_infrasound = path + 'mseed'
+path_audible = path + 'audiomoth'
 
-day1 = obspy.UTCDateTime('2021-03-01')
-day2 = obspy.UTCDateTime('2021-06-30')
+day1 = obspy.UTCDateTime('2022-06-09')
+day2 = obspy.UTCDateTime('2022-06-20')
 n_days = int(np.round((day2 - day1)/86400)) # length of study period in days
 
 ## Enter the times of day (UTC) to read data from.
@@ -78,12 +79,12 @@ for i in range(n_days):
     except: # do nothing if there's an error in the above code block
         medspec_list_infrasound.append([])
         meanspec_list_infrasound.append([])
-        power_infrasound.append(np.nan)
+        #power_infrasound.append(np.nan)
     else: # append the results to the output lists if there's no error
         freqs_infrasound_all = spec_info['freqs']
         medspec_list_infrasound.append(spec_info['median'])
         meanspec_list_infrasound.append(spec_info['mean'])
-        power_infrasound.append(np.sum(spec_info['mean']) * np.diff(spec_info['freqs'])[0]) # integral spec * df
+        #power_infrasound.append(np.sum(spec_info['mean']) * np.diff(spec_info['freqs'])[0]) # integral spec * df
 
     ## audible
     try:
@@ -92,12 +93,12 @@ for i in range(n_days):
     except:
         medspec_list_audible.append([])
         meanspec_list_audible.append([])
-        power_audible.append(np.nan)
+        #power_audible.append(np.nan)
     else:
         freqs_audible_all = spec_info['freqs']
         medspec_list_audible.append(spec_info['median'])
         meanspec_list_audible.append(spec_info['mean'])
-        power_audible.append(np.sum(spec_info['mean']) * np.diff(spec_info['freqs'])[0])
+        #power_audible.append(np.sum(spec_info['mean']) * np.diff(spec_info['freqs'])[0])
 
 ## reformat result lists from the loop into numpy arrays that are easy to plot
 w = (freqs_infrasound_all < 40) & (freqs_infrasound_all > 1)
@@ -105,12 +106,13 @@ freqs_infrasound = freqs_infrasound_all[w]
 meanspec_infrasound = reformat(meanspec_list_infrasound)[:,w]
 medspec_infrasound = reformat(medspec_list_infrasound)[:,w]
 #power_infrasound = reformat(power_infrasound)
+power_infrasound = medspec_infrasound.sum(1) * np.diff(freqs_infrasound)[0]
 
 w = (freqs_audible_all < 20000) & (freqs_audible_all > 40)
 freqs_audible = freqs_audible_all[w]    
 meanspec_audible = reformat(meanspec_list_audible)[:,w]    
 medspec_audible = reformat(medspec_list_audible)[:,w]
-#power_audible = reformat(power_audible)
+power_audible = medspec_audible.sum(1) * np.diff(freqs_audible)[0]
 
 xlim = [np.min(times_infrasound + times_audible), np.max(times_infrasound+times_audible)]
 ## plot the discharge, power, and spectrogram
