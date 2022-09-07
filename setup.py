@@ -43,7 +43,7 @@ INSTALL_REQUIRES = [
 #    'simpleaudio', # hard to install on windows? non-essential
     'acoustics',
     'obspy',
-    'numpy==1.21.0', # 1.22.0 breaks obspy 1.2.2. When new obspy is released, make both >=
+    'numpy==1.22.0', # 1.22.0 breaks obspy 1.2.2. When new obspy is released, make both >=
     'pandas>=1.0.0',
     'scipy>=1.0.0',
     'matplotlib>=3.2.0',
