@@ -23,7 +23,7 @@ def read_ref_spec(filename):
     return (np.array(s.freqs), np.array(s.spectrum))
 
 
-def site_infrasound_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
+def site_infrasound_reference_spectrum(infrasound_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
     window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
 
     ## function to create reference spectra for a site
