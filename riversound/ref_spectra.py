@@ -23,7 +23,7 @@ def read_ref_spec(filename):
     return (np.array(s.freqs), np.array(s.spectrum))
 
 
-def site_infrasound_reference_spectrum(infrasound_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
+def site_infrasound_reference_spectrum(infrasound_file, t1, t2, nfft_infrasound = 2**13, window = 'hamming', window_infrasound = None):
     window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
 
     ## function to create reference spectra for a site
@@ -41,9 +41,6 @@ def site_infrasound_reference_spectrum(infrasound_file, t1, t2, nfft_infrasound 
     q1 = np.quantile(infra_spec_info['specgram'][:,nn], 0.25, 1)[w]
     q3 = np.quantile(infra_spec_info['specgram'][:,nn], 0.75, 1)[w]
 
-    medspec = np.concatenate([medspec, medspec_audible])
-    q1 = np.concatenate([q1, q1_audible])
-    q3 = np.concatenate([q3, q3_audible])
     return pd.DataFrame.from_dict({'freqs':freqs, 'spectrum':medspec, 'q1':q1, 'q3':q3})
 
 
