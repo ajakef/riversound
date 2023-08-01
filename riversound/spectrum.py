@@ -84,6 +84,9 @@ def spectrum(tr, criterion_function = 'default', runmed_radius_t = 0,
     return {'specgram':sg, 'freqs':freqs, 'times':times, 'mean':np.nanmean(sg,1), 'median':np.nanmedian(sg,1), 'stdev': np.nanstd(sg, 1)}
 
 def round_sig(f, p): # thanks StackOverflow denizb
+    ## function to put a list of numbers in scientific notation
+    ## f: list of numbers
+    ## p: number of decimal places
     f = np.array(f)
     return np.array([float(('%.' + str(p) + 'e') % ff) for ff in f])
 

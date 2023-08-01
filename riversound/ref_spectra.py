@@ -23,6 +23,31 @@ def read_ref_spec(filename):
     return (np.array(s.freqs), np.array(s.spectrum))
 
 
+def site_infrasound_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
+    window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
+
+    ## function to create reference spectra for a site
+    nfft_infrasound = 2**13
+    tr_infrasound = obspy.read(infrasound_file)[0]
+    tr_infrasound = gemlog.deconvolve_gem_response(tr_infrasound) # must deconvolve when not using read_infrasound_audible
+    tr_infrasound.trim(t1,t2)
+    infra_spec_info = riversound.spectrum(tr_infrasound, nfft = nfft_infrasound,kurtosis_threshold = 0.25, overlap = 0.9, window = window_infrasound)
+
+    freqs = infra_spec_info['freqs']
+    w = (freqs < 40) & (freqs > 0)
+    freqs = freqs[w]    
+    medspec = infra_spec_info['median'][w]
+    nn = ~np.isnan(infra_spec_info['specgram'][0,:])
+    q1 = np.quantile(infra_spec_info['specgram'][:,nn], 0.25, 1)[w]
+    q3 = np.quantile(infra_spec_info['specgram'][:,nn], 0.75, 1)[w]
+
+    medspec = np.concatenate([medspec, medspec_audible])
+    q1 = np.concatenate([q1, q1_audible])
+    q3 = np.concatenate([q3, q3_audible])
+    return pd.DataFrame.from_dict({'freqs':freqs, 'spectrum':medspec, 'q1':q1, 'q3':q3})
+
+
+
 def site_reference_spectrum(infrasound_file, audible_file, t1, t2, nfft_infrasound = 2**13, nfft_audible = 2**15, window = 'hamming', window_infrasound = None, window_audible = None):
     window_infrasound = _process_window_inputs(window, window_infrasound, nfft_infrasound)
     window_audible = _process_window_inputs(window, window_audible, nfft_audible)
